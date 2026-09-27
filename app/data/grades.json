@@ -1,0 +1,9 @@
+[
+  { "id": "c5", "label": "Class 5", "short": "5", "bangla": "পঞ্চম" },
+  { "id": "c6", "label": "Class 6", "short": "6", "bangla": "ষষ্ঠ" },
+  { "id": "c7", "label": "Class 7", "short": "7", "bangla": "সপ্তম" },
+  { "id": "c8", "label": "Class 8", "short": "8", "bangla": "অষ্টম" },
+  { "id": "c9", "label": "Class 9", "short": "9", "bangla": "নবম" },
+  { "id": "c10", "label": "Class 10", "short": "10", "bangla": "দশম" },
+  { "id": "ssc", "label": "SSC", "short": "SSC", "bangla": "এসএসসি" }
+]

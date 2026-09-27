@@ -3,8 +3,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { NOTES, QUIZZES, SUBJECTS } from '../../constants/data';
+import type { Note, Quiz, Subject } from '../../constants/data';
 import { Colors, Radius } from '../../constants/theme';
+import notesJson from '../../data/notes.json';
+import quizzesJson from '../../data/quizzes.json';
+import subjectsJson from '../../data/subjects.json';
+
+const SUBJECTS = subjectsJson as Subject[];
+const NOTES = notesJson as Note[];
+const QUIZZES = quizzesJson as Quiz[];
 
 export default function SubjectDetail() {
   const { id, grade } = useLocalSearchParams<{ id: string; grade?: string }>();

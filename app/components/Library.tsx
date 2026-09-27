@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { NOTES, QUIZZES, type Note, type Quiz } from '../constants/data';
+import { type Note, type Quiz } from '../constants/data';
 import { Colors, Radius } from '../constants/theme';
 
-export function NotesSection({ onOpenAll }: { onOpenAll?: () => void }) {
+export function NotesSection({ notes }: { notes: Note[] }) {
   return (
     <View style={styles.row}>
-      {NOTES.slice(0, 4).map((n) => (
+      {notes.slice(0, 4).map((n) => (
         <NoteCard key={n.id} note={n} />
       ))}
     </View>
@@ -36,10 +36,10 @@ function NoteCard({ note }: { note: Note }) {
   );
 }
 
-export function QuizSection() {
+export function QuizSection({ quizzes }: { quizzes: Quiz[] }) {
   return (
     <View style={styles.quizList}>
-      {QUIZZES.map((q) => (
+      {quizzes.map((q) => (
         <QuizRow key={q.id} quiz={q} />
       ))}
     </View>

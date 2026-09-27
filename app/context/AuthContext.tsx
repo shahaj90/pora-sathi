@@ -1,6 +1,9 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
-import { GRADES, type GradeId } from '../constants/data';
+import { type Grade, type GradeId } from '../constants/data';
 import { DEMO_USER } from '../constants/demoUser';
+import gradesJson from '../data/grades.json';
+
+const GRADES = gradesJson as Grade[];
 
 export interface SessionUser {
   name: string;

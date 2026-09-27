@@ -1,15 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { ContinueLearning, DashboardStats } from '../constants/data';
 import { Colors, Radius } from '../constants/theme';
 
 export function HomeHeader({
   name,
   grades,
+  stats,
   onLogout,
 }: {
   name: string;
   grades: string[];
+  stats: DashboardStats;
   onLogout: () => void;
 }) {
   const gradeLabel =
@@ -59,15 +62,15 @@ export function HomeHeader({
 
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>68%</Text>
+          <Text style={styles.statValue}>{stats.syllabusPct}%</Text>
           <Text style={styles.statLabel}>Syllabus done</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>24</Text>
+          <Text style={styles.statValue}>{stats.quizzesDone}</Text>
           <Text style={styles.statLabel}>Quizzes done</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>142</Text>
+          <Text style={styles.statValue}>{stats.notesCount}</Text>
           <Text style={styles.statLabel}>PDF notes</Text>
         </View>
       </View>
@@ -75,15 +78,15 @@ export function HomeHeader({
   );
 }
 
-export function ContinueCard({ onAsk }: { onAsk: () => void }) {
+export function ContinueCard({ item, onAsk }: { item: ContinueLearning; onAsk: () => void }) {
   return (
     <View style={c.wrap}>
       <View style={{ flex: 1 }}>
         <Text style={c.kicker}>CONTINUE LEARNING</Text>
-        <Text style={c.title}>Quadratic Equations — Part 3</Text>
-        <Text style={c.sub}>Mathematics · 8 min left · Class 10</Text>
+        <Text style={c.title}>{item.title}</Text>
+        <Text style={c.sub}>{item.meta}</Text>
         <View style={c.bar}>
-          <View style={c.fill} />
+          <View style={[c.fill, { width: `${Math.round(item.progress * 100)}%` }]} />
         </View>
       </View>
       <Pressable style={c.play} onPress={onAsk}>

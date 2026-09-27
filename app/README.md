@@ -17,6 +17,13 @@ Vibrant, clean, responsive Expo (React Native) dashboard UI.
 - `components/ChatFAB.tsx` — floating AI chat button
 - `components/BottomNav.tsx` — Home / Notes / Quiz / Progress
 
+## Data layer (demo JSON → endpoints later)
+
+- `data/*.json` — demo payloads: `grades`, `subjects`, `notes`, `quizzes`, `dashboard` (stats + continue-learning).
+- `lib/api.ts` — the only place screens get data from: `fetchGrades`, `fetchSubjects`, `fetchNotes`, `fetchQuizzes`, `fetchDashboardMeta`. Each serves local JSON with a simulated delay; every function documents the `fetch(API_BASE_URL + …)` swap. Callers already handle loading/error/retry, so endpoint migration needs no UI changes.
+- `constants/data.ts` — TypeScript types only, no data.
+- Demo auth: `context/AuthContext.tsx` + `constants/demoUser.ts` (`demo@porasathi.com` / `demo1234`).
+
 ## Run
 
 ```bash

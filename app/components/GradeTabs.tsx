@@ -1,14 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { GRADES, type GradeId } from '../constants/data';
+import { type Grade, type GradeId } from '../constants/data';
 import { Colors } from '../constants/theme';
 
 interface Props {
+  grades: Grade[];
   active: GradeId;
   onChange: (g: GradeId) => void;
 }
 
-export function GradeTabs({ active, onChange }: Props) {
+export function GradeTabs({ grades, active, onChange }: Props) {
   return (
     <View>
       <ScrollView
@@ -16,7 +17,7 @@ export function GradeTabs({ active, onChange }: Props) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.row}
       >
-        {GRADES.map((g) => {
+        {grades.map((g) => {
           const selected = g.id === active;
           const isSSC = g.id === 'ssc';
           return (

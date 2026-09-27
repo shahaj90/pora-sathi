@@ -14,8 +14,11 @@ import {
 } from 'react-native';
 import { AuthField } from '../components/AuthField';
 import { Colors, Radius } from '../constants/theme';
-import { GRADES, type GradeId } from '../constants/data';
+import { type Grade, type GradeId } from '../constants/data';
 import { useAuth } from '../context/AuthContext';
+import gradesJson from '../data/grades.json';
+
+const GRADES = gradesJson as Grade[];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

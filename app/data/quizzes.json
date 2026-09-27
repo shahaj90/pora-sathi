@@ -1,0 +1,41 @@
+[
+  {
+    "id": "q1",
+    "subjectId": "mathematics",
+    "title": "Algebra Sprint",
+    "questions": 15,
+    "minutes": 20,
+    "difficulty": "Medium",
+    "attempts": "4.2k",
+    "bestScore": 80
+  },
+  {
+    "id": "q2",
+    "subjectId": "physics",
+    "title": "Newton Laws Challenge",
+    "questions": 12,
+    "minutes": 15,
+    "difficulty": "Hard",
+    "attempts": "2.8k",
+    "bestScore": 67
+  },
+  {
+    "id": "q3",
+    "subjectId": "chemistry",
+    "title": "Periodic Table Blitz",
+    "questions": 10,
+    "minutes": 10,
+    "difficulty": "Easy",
+    "attempts": "5.1k",
+    "bestScore": 90
+  },
+  {
+    "id": "q4",
+    "subjectId": "english",
+    "title": "Vocabulary Master — SSC",
+    "questions": 20,
+    "minutes": 15,
+    "difficulty": "Medium",
+    "attempts": "6.3k"
+  }
+]
