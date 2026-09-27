@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Pora Sathi",
+    "slug": "pora-sathi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "porasathi",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#6C3CE0"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.porasathi.app"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": ["expo-router"]
+  }
+}
