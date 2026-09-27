@@ -33,7 +33,7 @@ export default function Dashboard() {
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
           <HomeHeader
             name={user?.name ?? 'Guest'}
-            grade={user?.grade ?? 'Class 10'}
+            grades={user?.grades ?? ['Class 10']}
             onLogout={handleLogout}
           />
           <View style={styles.gradeWrap}>

@@ -5,13 +5,15 @@ import { Colors, Radius } from '../constants/theme';
 
 export function HomeHeader({
   name,
-  grade,
+  grades,
   onLogout,
 }: {
   name: string;
-  grade: string;
+  grades: string[];
   onLogout: () => void;
 }) {
+  const gradeLabel =
+    grades.length <= 1 ? (grades[0] ?? 'Class 10') : `${grades[0]} +${grades.length - 1}`;
   return (
     <LinearGradient
       colors={['#6C3CE0', '#8B5CF6', '#B794FF']}
@@ -27,7 +29,7 @@ export function HomeHeader({
           <View>
             <Text style={styles.hello}>Assalamu Alaikum 👋</Text>
             <Text style={styles.name}>
-              {name} · {grade}
+              {name} · {gradeLabel}
             </Text>
           </View>
         </View>

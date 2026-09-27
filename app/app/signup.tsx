@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { AuthField } from '../components/AuthField';
 import { Colors, Radius } from '../constants/theme';
+import { GRADES, type GradeId } from '../constants/data';
 import { useAuth } from '../context/AuthContext';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,23 +25,35 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string; confirm?: string }>({});
+  const [gradeIds, setGradeIds] = useState<GradeId[]>(['c10']);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    confirm?: string;
+    grades?: string;
+  }>({});
   const [loading, setLoading] = useState(false);
 
   const clear = (key: keyof typeof errors) => setErrors((e) => ({ ...e, [key]: undefined }));
+
+  const toggleGrade = (id: GradeId) => {
+    setGradeIds((prev) => (prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]));
+    clear('grades');
+  };
 
   const submit = () => {
     const next: typeof errors = {};
     if (!EMAIL_RE.test(email.trim())) next.email = 'Enter a valid email address';
     if (password.length < 6) next.password = 'Password must be at least 6 characters';
     if (confirm !== password) next.confirm = 'Passwords do not match';
+    if (gradeIds.length === 0) next.grades = 'Select at least one class';
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
     // Mock signup — register() creates a local session.
     setLoading(true);
     setTimeout(() => {
-      register(email);
+      register(email, gradeIds);
       setLoading(false);
       router.replace('/');
     }, 900);
@@ -107,6 +120,30 @@ export default function Signup() {
               error={errors.confirm}
               secure
             />
+
+            <View style={styles.gradeWrap}>
+              <Text style={styles.gradeLabel}>Class (select one or more)</Text>
+              <View style={styles.chips}>
+                {GRADES.map((g) => {
+                  const selected = gradeIds.includes(g.id);
+                  return (
+                    <Pressable
+                      key={g.id}
+                      onPress={() => toggleGrade(g.id)}
+                      accessibilityRole="checkbox"
+                      accessibilityState={{ checked: selected }}
+                      style={[styles.chip, selected && styles.chipActive]}
+                    >
+                      {selected ? <Ionicons name="checkmark" size={14} color="#fff" /> : null}
+                      <Text style={[styles.chipText, selected && styles.chipTextActive]}>
+                        {g.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              {errors.grades ? <Text style={styles.error}>{errors.grades}</Text> : null}
+            </View>
 
             <Pressable
               onPress={submit}
@@ -178,6 +215,24 @@ const styles = StyleSheet.create({
   },
   btnPressed: { opacity: 0.85 },
   btnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
+  gradeWrap: { marginBottom: 14 },
+  gradeLabel: { fontSize: 13, fontWeight: '700', color: Colors.text, marginBottom: 8 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 999,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  chipText: { fontSize: 13, fontWeight: '700', color: Colors.muted },
+  chipTextActive: { color: '#fff' },
+  error: { fontSize: 12, color: '#FF5C5C', marginTop: 6, fontWeight: '600' },
   switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
   switchText: { color: Colors.muted, fontSize: 13 },
   switchLink: { color: Colors.primary, fontSize: 13, fontWeight: '800' },
