@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Radius } from '../constants/theme';
+import { Colors, Gradients, Radius } from '../constants/theme';
 
 interface Msg {
   id: string;
@@ -58,7 +58,7 @@ export default function ChatScreen() {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <LinearGradient colors={['#6C3CE0', '#8B5CF6']} style={styles.header}>
+        <LinearGradient colors={Gradients.header} style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.back}>
             <Ionicons name="arrow-back" size={20} color={Colors.surface} />
           </Pressable>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   list: { padding: 16, gap: 10, paddingBottom: 24 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
   chip: {
-    backgroundColor: Colors.violetLight,
+    backgroundColor: Colors.primarySoft,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: Colors.violetLight,
+    backgroundColor: Colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },

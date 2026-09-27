@@ -16,7 +16,7 @@ import { AuthField } from '../components/AuthField';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Chip } from '../components/ui/Chip';
-import { Colors, Radius } from '../constants/theme';
+import { Colors, Gradients, Radius } from '../constants/theme';
 import { type Grade, type GradeId } from '../constants/data';
 import { useAuth } from '../context/AuthContext';
 import gradesJson from '../data/grades.json';
@@ -85,7 +85,7 @@ export default function Signup() {
           keyboardShouldPersistTaps="handled"
         >
           <LinearGradient
-            colors={[Colors.pink, Colors.accent]}
+            colors={Gradients.sunset}
             style={styles.hero}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -176,7 +176,7 @@ export default function Signup() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.pink },
+  safe: { flex: 1, backgroundColor: Colors.background },
   flex: { flex: 1 },
   scroll: { flexGrow: 1, backgroundColor: Colors.background },
   hero: {
@@ -188,16 +188,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: Colors.surface,
+    width: 68,
+    height: 68,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  heroTitle: { color: Colors.surface, fontSize: 24, fontWeight: '900' },
-  heroSub: { color: 'rgba(255,255,255,0.9)', fontSize: 13, marginTop: 4, textAlign: 'center' },
+  heroTitle: { color: Colors.surface, fontSize: 26, fontWeight: '900' },
+  heroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 13, marginTop: 6, textAlign: 'center' },
   card: {
     marginHorizontal: 16,
     marginTop: -36,
@@ -208,11 +210,11 @@ const styles = StyleSheet.create({
   submit: { marginTop: 6 },
   error: { fontSize: 12, color: Colors.danger, marginTop: 6, fontWeight: '600' },
   switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
-  switchText: { color: Colors.muted, fontSize: 13 },
+  switchText: { color: Colors.textSecondary, fontSize: 13 },
   switchLink: { color: Colors.primary, fontSize: 13, fontWeight: '800' },
   guest: { alignItems: 'center', marginTop: 12, paddingVertical: 6 },
   guestText: {
-    color: Colors.muted,
+    color: Colors.textSecondary,
     fontSize: 13,
     fontWeight: '700',
     textDecorationLine: 'underline',

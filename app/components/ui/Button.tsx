@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   primary: { backgroundColor: Colors.primary },
-  soft: { backgroundColor: Colors.violetLight },
+  soft: { backgroundColor: Colors.primarySoft },
   ghost: { backgroundColor: 'transparent' },
   pressed: { opacity: 0.86 },
   disabled: { opacity: 0.7 },

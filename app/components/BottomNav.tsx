@@ -40,7 +40,7 @@ export function BottomNav({
             <Ionicons
               name={selected ? t.icon : t.iconOutline}
               size={22}
-              color={selected ? Colors.primary : Colors.muted}
+              color={selected ? Colors.primary : Colors.textSecondary}
             />
             <Text style={[styles.label, selected && styles.labelActive]}>{t.label}</Text>
             {selected ? <View style={styles.pill} /> : null}
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   tab: { flex: 1, alignItems: 'center', gap: 3 },
-  label: { fontSize: 11, color: Colors.muted, fontWeight: '600' },
+  label: { fontSize: 11, color: Colors.textSecondary, fontWeight: '600' },
   labelActive: { color: Colors.primary, fontWeight: '800' },
   pill: { width: 20, height: 3, borderRadius: 2, backgroundColor: Colors.primary, marginTop: 2 },
 });

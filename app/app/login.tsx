@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthField } from '../components/AuthField';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Colors, Radius } from '../constants/theme';
+import { Colors, Gradients, Radius } from '../constants/theme';
 import { DEMO_USER } from '../constants/demoUser';
 import { useAuth } from '../context/AuthContext';
 
@@ -75,7 +75,7 @@ export default function Login() {
           keyboardShouldPersistTaps="handled"
         >
           <LinearGradient
-            colors={['#6C3CE0', '#8B5CF6', '#B794FF']}
+            colors={Gradients.header}
             style={styles.hero}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -153,7 +153,7 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.primary },
+  safe: { flex: 1, backgroundColor: Colors.background },
   flex: { flex: 1 },
   scroll: { flexGrow: 1, backgroundColor: Colors.background },
   hero: {
@@ -165,16 +165,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: Colors.surface,
+    width: 68,
+    height: 68,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  heroTitle: { color: Colors.surface, fontSize: 24, fontWeight: '900' },
-  heroSub: { color: 'rgba(255,255,255,0.85)', fontSize: 13, marginTop: 4, textAlign: 'center' },
+  heroTitle: { color: Colors.surface, fontSize: 26, fontWeight: '900' },
+  heroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 13, marginTop: 6, textAlign: 'center' },
   card: {
     marginHorizontal: 16,
     marginTop: -36,
@@ -192,11 +194,11 @@ const styles = StyleSheet.create({
   },
   formErrorText: { flex: 1, fontSize: 12.5, color: Colors.dangerText, fontWeight: '600' },
   switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
-  switchText: { color: Colors.muted, fontSize: 13 },
+  switchText: { color: Colors.textSecondary, fontSize: 13 },
   switchLink: { color: Colors.primary, fontSize: 13, fontWeight: '800' },
   guest: { alignItems: 'center', marginTop: 12, paddingVertical: 6 },
   guestText: {
-    color: Colors.muted,
+    color: Colors.textSecondary,
     fontSize: 13,
     fontWeight: '700',
     textDecorationLine: 'underline',

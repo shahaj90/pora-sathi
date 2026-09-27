@@ -76,7 +76,7 @@ export default function SubjectDetail() {
             <Ionicons
               name="document-text"
               size={16}
-              color={activeTab === 'notes' ? Colors.surface : Colors.muted}
+              color={activeTab === 'notes' ? Colors.surface : Colors.textSecondary}
             />
             <Text style={[styles.tabText, activeTab === 'notes' && styles.tabTextActive]}>
               PDF Notes
@@ -89,7 +89,7 @@ export default function SubjectDetail() {
             <Ionicons
               name="help-circle"
               size={16}
-              color={activeTab === 'quiz' ? Colors.surface : Colors.muted}
+              color={activeTab === 'quiz' ? Colors.surface : Colors.textSecondary}
             />
             <Text style={[styles.tabText, activeTab === 'quiz' && styles.tabTextActive]}>
               Quizzes
@@ -207,8 +207,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  tabActive: { backgroundColor: Colors.text, borderColor: Colors.text },
-  tabText: { fontWeight: '700', color: Colors.muted, fontSize: 13 },
+  tabActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  tabText: { fontWeight: '700', color: Colors.textSecondary, fontSize: 13 },
   tabTextActive: { color: Colors.surface },
   list: { paddingHorizontal: 16, marginTop: 12, gap: 10 },
   card: {
@@ -231,14 +231,14 @@ const styles = StyleSheet.create({
   },
   pdfText: { color: Colors.surface, fontWeight: '900', fontSize: 12 },
   cardTitle: { fontSize: 13.5, fontWeight: '800', color: Colors.text },
-  cardSub: { fontSize: 11.5, color: Colors.muted, marginTop: 3 },
-  start: { color: Colors.primary, fontWeight: '800', fontSize: 13 },
+  cardSub: { fontSize: 11.5, color: Colors.textSecondary, marginTop: 3 },
+  start: { color: Colors.accent, fontWeight: '800', fontSize: 13 },
   aiCta: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.accent,
     marginHorizontal: 16,
     marginTop: 16,
     paddingVertical: 14,

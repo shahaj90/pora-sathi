@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { ContinueLearning, DashboardStats } from '../constants/data';
-import { Colors, Radius, Shadow } from '../constants/theme';
+import { Colors, Gradients, Radius, Shadow } from '../constants/theme';
 import { ProgressBar } from './ui/ProgressBar';
 
 export function HomeHeader({
@@ -28,7 +28,7 @@ export function HomeHeader({
     grades.length <= 1 ? (grades[0] ?? 'Class 10') : `${grades[0]} +${grades.length - 1}`;
   return (
     <LinearGradient
-      colors={['#6C3CE0', '#8B5CF6', '#B794FF']}
+      colors={Gradients.header}
       style={styles.header}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { fontSize: 20, fontWeight: '800', color: Colors.primary },
+  avatarText: { fontSize: 20, fontWeight: '800', color: Colors.primaryDark },
   hello: { color: 'rgba(255,255,255,0.85)', fontSize: 12 },
   name: { color: Colors.surface, fontSize: 15, fontWeight: '800' },
   iconRow: { flexDirection: 'row', gap: 8 },
@@ -175,48 +175,49 @@ const styles = StyleSheet.create({
   },
   searchInput: { flex: 1, color: Colors.text, fontSize: 14, paddingVertical: 2 },
   mic: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: Colors.primary,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   statsRow: { flexDirection: 'row', gap: 10, marginTop: 14 },
   statCard: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255,255,255,0.16)',
     borderRadius: Radius.md,
     padding: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: 'rgba(255,255,255,0.22)',
   },
-  statValue: { color: Colors.surface, fontWeight: '800', fontSize: 16 },
-  statLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 11, marginTop: 2 },
+  statValue: { color: Colors.surface, fontWeight: '800', fontSize: 18 },
+  statLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 11, marginTop: 2, fontWeight: '600' },
 });
 
 const c = StyleSheet.create({
   fill: { flex: 1 },
   wrap: {
     marginHorizontal: 16,
-    marginTop: -0,
-    backgroundColor: Colors.text,
+    marginTop: 16,
+    marginBottom: 6,
+    backgroundColor: Colors.primary,
     borderRadius: Radius.lg,
-    padding: 14,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 14,
     ...Shadow.card,
   },
-  kicker: { color: Colors.yellow, fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  kicker: { color: Colors.warning, fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   title: { color: Colors.surface, fontSize: 15, fontWeight: '800', marginTop: 4 },
-  sub: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  sub: { color: 'rgba(255,255,255,0.72)', fontSize: 12, marginTop: 2 },
   bar: { marginTop: 10 },
   play: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },

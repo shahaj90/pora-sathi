@@ -53,7 +53,7 @@ export function ProgressSection({
               {s.chapters} chapters · {s.notesCount} PDFs · {s.quizCount} quizzes
             </Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={Colors.muted} />
+          <Ionicons name="chevron-forward" size={18} color={Colors.textSecondary} />
         </Card>
       ))}
     </View>
@@ -64,13 +64,13 @@ const styles = StyleSheet.create({
   wrap: { paddingHorizontal: 16, gap: 10 },
   fill: { flex: 1 },
   overall: {
-    backgroundColor: Colors.text,
+    backgroundColor: Colors.primary,
     borderRadius: Radius.lg,
     padding: 16,
     ...Shadow.card,
   },
   overallValue: { color: Colors.surface, fontSize: 28, fontWeight: '900' },
-  overallLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  overallLabel: { color: 'rgba(255,255,255,0.72)', fontSize: 12, marginTop: 2 },
   overallBar: { marginTop: 12 },
   row: {
     flexDirection: 'row',
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   icon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   name: { fontSize: 14, fontWeight: '800', color: Colors.text },
-  pct: { fontSize: 13, fontWeight: '800', color: Colors.primary },
+  pct: { fontSize: 13, fontWeight: '800', color: Colors.accent },
   bar: { marginTop: 8 },
-  meta: { fontSize: 11, color: Colors.muted, marginTop: 6 },
+  meta: { fontSize: 11, color: Colors.textSecondary, marginTop: 6 },
 });

@@ -35,6 +35,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: { fontSize: 17, fontWeight: '800', color: Colors.text },
-  bangla: { fontSize: 12, color: Colors.muted, marginTop: 2 },
-  action: { fontSize: 13, fontWeight: '700', color: Colors.primary },
+  bangla: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
+  action: { fontSize: 13, fontWeight: '700', color: Colors.accent },
 });

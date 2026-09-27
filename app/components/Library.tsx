@@ -55,9 +55,9 @@ export function QuizSection({ quizzes, onPlay }: { quizzes: Quiz[]; onPlay: (q: 
 function QuizRow({ quiz, onPlay }: { quiz: Quiz; onPlay: (q: Quiz) => void }) {
   const diffColor =
     quiz.difficulty === 'Easy'
-      ? Colors.teal
+      ? Colors.accent
       : quiz.difficulty === 'Medium'
-        ? Colors.accent
+        ? Colors.warning
         : Colors.pink;
   return (
     <Card padding={12} style={styles.quizCard}>
@@ -114,14 +114,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: { fontSize: 13, fontWeight: '800', color: Colors.text, lineHeight: 18 },
-  chapter: { fontSize: 11, color: Colors.muted, marginTop: 4 },
+  chapter: { fontSize: 11, color: Colors.textSecondary, marginTop: 4 },
   metaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 10,
   },
-  meta: { fontSize: 11, color: Colors.muted },
+  meta: { fontSize: 11, color: Colors.textSecondary },
   dl: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   dlText: { fontSize: 11, fontWeight: '700', color: Colors.primary },
   quizList: { paddingHorizontal: 16, gap: 10 },
@@ -138,16 +138,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   quizTitle: { fontSize: 14, fontWeight: '800', color: Colors.text },
-  quizMeta: { fontSize: 11, color: Colors.muted, marginTop: 2 },
+  quizMeta: { fontSize: 11, color: Colors.textSecondary, marginTop: 2 },
   tagRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
   tag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999 },
   tagText: { fontSize: 11, fontWeight: '800' },
-  best: { fontSize: 11, color: Colors.muted, fontWeight: '600' },
+  best: { fontSize: 11, color: Colors.textSecondary, fontWeight: '600' },
   playBtn: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },

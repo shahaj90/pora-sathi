@@ -277,7 +277,7 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.primary },
+  safe: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, backgroundColor: Colors.background },
   scroll: { paddingBottom: 8 },
   gradeWrap: { marginTop: 12 },
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 24,
   },
-  centerText: { fontSize: 14, color: Colors.muted, textAlign: 'center' },
+  centerText: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
   refresh: { marginTop: 8 },
   spacer: { height: 140 },
 });

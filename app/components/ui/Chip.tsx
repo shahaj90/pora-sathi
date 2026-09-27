@@ -37,7 +37,7 @@ export function Chip({
     >
       {selected ? <Ionicons name="checkmark" size={14} color={Colors.surface} /> : null}
       {icon && !selected ? (
-        <Ionicons name={icon} size={14} color={accent ? Colors.accent : Colors.muted} />
+        <Ionicons name={icon} size={14} color={accent ? Colors.warning : Colors.textSecondary} />
       ) : null}
       <Text style={[styles.text, selected && styles.textSelected]}>{label}</Text>
     </Pressable>
@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   selected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  accent: { borderColor: Colors.accentBorder, backgroundColor: Colors.accentSoft },
+  accent: { borderColor: Colors.warning, backgroundColor: Colors.warningSoft },
   pressed: { opacity: 0.88 },
-  text: { fontSize: 13, fontWeight: '700', color: Colors.muted },
+  text: { fontSize: 13, fontWeight: '700', color: Colors.textSecondary },
   textSelected: { color: Colors.surface },
 });
