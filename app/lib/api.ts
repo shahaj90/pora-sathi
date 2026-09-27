@@ -4,6 +4,7 @@ import type {
   Grade,
   Note,
   Quiz,
+  SscBanner,
   Subject,
 } from '../constants/data';
 import dashboardJson from '../data/dashboard.json';
@@ -55,6 +56,7 @@ export async function fetchQuizzes(): Promise<Quiz[]> {
 export interface DashboardMeta {
   stats: DashboardStats;
   continue: ContinueLearning;
+  sscBanner: SscBanner;
 }
 
 export async function fetchDashboardMeta(): Promise<DashboardMeta> {

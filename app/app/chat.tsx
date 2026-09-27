@@ -7,12 +7,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Radius } from '../constants/theme';
 
 interface Msg {
@@ -60,16 +60,16 @@ export default function ChatScreen() {
       >
         <LinearGradient colors={['#6C3CE0', '#8B5CF6']} style={styles.header}>
           <Pressable onPress={() => router.back()} style={styles.back}>
-            <Ionicons name="arrow-back" size={20} color="#fff" />
+            <Ionicons name="arrow-back" size={20} color={Colors.surface} />
           </Pressable>
           <View style={styles.botAvatar}>
-            <Ionicons name="sparkles" size={20} color="#fff" />
+            <Ionicons name="sparkles" size={20} color={Colors.surface} />
           </View>
-          <View style={{ flex: 1 }}>
+          <View style={styles.flex}>
             <Text style={styles.title}>Pora Sathi AI</Text>
             <Text style={styles.online}>● Online · Class 10 tutor</Text>
           </View>
-          <Ionicons name="ellipsis-vertical" size={18} color="#fff" />
+          <Ionicons name="ellipsis-vertical" size={18} color={Colors.surface} />
         </LinearGradient>
 
         <FlatList
@@ -107,7 +107,7 @@ export default function ChatScreen() {
             onSubmitEditing={() => send()}
           />
           <Pressable style={styles.send} onPress={() => send()}>
-            <Ionicons name="send" size={18} color="#fff" />
+            <Ionicons name="send" size={18} color={Colors.surface} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -116,7 +116,7 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
+  safe: { flex: 1, backgroundColor: Colors.surface },
   flex: { flex: 1 },
   header: {
     flexDirection: 'row',
@@ -146,22 +146,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.4)',
   },
-  title: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  title: { color: Colors.surface, fontWeight: '800', fontSize: 16 },
   online: { color: 'rgba(255,255,255,0.85)', fontSize: 12 },
   list: { padding: 16, gap: 10, paddingBottom: 24 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
   chip: {
-    backgroundColor: '#EDE7FF',
+    backgroundColor: Colors.violetLight,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
   },
   chipText: { color: Colors.primary, fontSize: 12, fontWeight: '700' },
   bubble: { maxWidth: '82%', padding: 12, borderRadius: Radius.md },
-  ai: { backgroundColor: '#F1EDFF', alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
+  ai: { backgroundColor: Colors.bubble, alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
   user: { backgroundColor: Colors.primary, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
   msgText: { fontSize: 13.5, lineHeight: 19, color: Colors.text },
-  userText: { color: '#fff' },
+  userText: { color: Colors.surface },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -169,19 +169,19 @@ const styles = StyleSheet.create({
     padding: 12,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
   },
   attach: {
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: '#EDE7FF',
+    backgroundColor: Colors.violetLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   input: {
     flex: 1,
-    backgroundColor: '#F5F3FF',
+    backgroundColor: Colors.background,
     borderRadius: 22,
     paddingHorizontal: 14,
     paddingVertical: 10,

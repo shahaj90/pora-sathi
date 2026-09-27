@@ -1,23 +1,29 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { type Note, type Quiz } from '../constants/data';
-import { Colors, Radius } from '../constants/theme';
+import { Colors } from '../constants/theme';
+import { Card } from './ui/Card';
 
-export function NotesSection({ notes }: { notes: Note[] }) {
+export function NotesSection({ notes, onOpen }: { notes: Note[]; onOpen: (n: Note) => void }) {
   return (
     <View style={styles.row}>
       {notes.slice(0, 4).map((n) => (
-        <NoteCard key={n.id} note={n} />
+        <NoteCard key={n.id} note={n} onOpen={onOpen} />
       ))}
     </View>
   );
 }
 
-function NoteCard({ note }: { note: Note }) {
+function NoteCard({ note, onOpen }: { note: Note; onOpen: (n: Note) => void }) {
   return (
-    <Pressable style={styles.card}>
+    <Card
+      onPress={() => onOpen(note)}
+      accessibilityLabel={`Open note: ${note.title}`}
+      padding={12}
+      style={styles.card}
+    >
       <View style={styles.pdfBadge}>
-        <Ionicons name="document-text" size={18} color="#fff" />
+        <Ionicons name="document-text" size={18} color={Colors.surface} />
       </View>
       <Text numberOfLines={2} style={styles.title}>
         {note.title}
@@ -32,29 +38,33 @@ function NoteCard({ note }: { note: Note }) {
           <Text style={styles.dlText}>{note.downloads}</Text>
         </View>
       </View>
-    </Pressable>
+    </Card>
   );
 }
 
-export function QuizSection({ quizzes }: { quizzes: Quiz[] }) {
+export function QuizSection({ quizzes, onPlay }: { quizzes: Quiz[]; onPlay: (q: Quiz) => void }) {
   return (
     <View style={styles.quizList}>
       {quizzes.map((q) => (
-        <QuizRow key={q.id} quiz={q} />
+        <QuizRow key={q.id} quiz={q} onPlay={onPlay} />
       ))}
     </View>
   );
 }
 
-function QuizRow({ quiz }: { quiz: Quiz }) {
+function QuizRow({ quiz, onPlay }: { quiz: Quiz; onPlay: (q: Quiz) => void }) {
   const diffColor =
-    quiz.difficulty === 'Easy' ? '#00A88F' : quiz.difficulty === 'Medium' ? '#FF8A3D' : '#FF5C8A';
+    quiz.difficulty === 'Easy'
+      ? Colors.teal
+      : quiz.difficulty === 'Medium'
+        ? Colors.accent
+        : Colors.pink;
   return (
-    <View style={styles.quizCard}>
+    <Card padding={12} style={styles.quizCard}>
       <View style={[styles.quizIcon, { backgroundColor: `${diffColor}1A` }]}>
         <Ionicons name="help-circle" size={22} color={diffColor} />
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={styles.fill}>
         <Text style={styles.quizTitle}>{quiz.title}</Text>
         <Text style={styles.quizMeta}>
           {quiz.questions} Qs · {quiz.minutes} min · {quiz.attempts} attempts
@@ -70,14 +80,20 @@ function QuizRow({ quiz }: { quiz: Quiz }) {
           )}
         </View>
       </View>
-      <Pressable style={styles.playBtn}>
-        <Ionicons name="play" size={16} color="#fff" />
+      <Pressable
+        style={styles.playBtn}
+        onPress={() => onPlay(quiz)}
+        accessibilityRole="button"
+        accessibilityLabel={`Start quiz: ${quiz.title}`}
+      >
+        <Ionicons name="play" size={16} color={Colors.surface} />
       </Pressable>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
+  fill: { flex: 1 },
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -85,19 +101,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: Radius.md,
-    padding: 12,
     width: '48%',
     flexGrow: 1,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   pdfBadge: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: '#FF5C5C',
+    backgroundColor: Colors.danger,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
@@ -115,14 +126,9 @@ const styles = StyleSheet.create({
   dlText: { fontSize: 11, fontWeight: '700', color: Colors.primary },
   quizList: { paddingHorizontal: 16, gap: 10 },
   quizCard: {
-    backgroundColor: '#fff',
-    borderRadius: Radius.md,
-    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   quizIcon: {
     width: 44,

@@ -1,8 +1,14 @@
 {
-  "stats": { "syllabusPct": 68, "quizzesDone": 24, "notesCount": 142 },
+  "stats": { "syllabusPct": 68, "quizzesDone": 24, "notesCount": 142, "streak": 12 },
   "continue": {
     "title": "Quadratic Equations — Part 3",
     "meta": "Mathematics · 8 min left · Class 10",
     "progress": 0.72
+  },
+  "sscBanner": {
+    "tag": "SSC 2027 · 214 DAYS LEFT",
+    "title": "SSC Crash Course + Model Tests",
+    "subtitle": "All subjects · 12 model tests · AI evaluation",
+    "action": "Resume"
   }
 }

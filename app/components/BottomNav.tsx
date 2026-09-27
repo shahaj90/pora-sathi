@@ -2,22 +2,43 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '../constants/theme';
 
-const TABS = [
-  { id: 'home', icon: 'home', label: 'Home' },
-  { id: 'notes', icon: 'document-text', label: 'Notes' },
-  { id: 'quiz', icon: 'help-circle', label: 'Quiz' },
-  { id: 'progress', icon: 'stats-chart', label: 'Progress' },
-] as const;
+export type BottomTabId = 'home' | 'notes' | 'quiz' | 'progress';
 
-export function BottomNav({ active, onChange }: { active: string; onChange: (t: string) => void }) {
+interface Tab {
+  id: BottomTabId;
+  icon: keyof typeof Ionicons.glyphMap;
+  iconOutline: keyof typeof Ionicons.glyphMap;
+  label: string;
+}
+
+const TABS: Tab[] = [
+  { id: 'home', icon: 'home', iconOutline: 'home-outline', label: 'Home' },
+  { id: 'notes', icon: 'document-text', iconOutline: 'document-text-outline', label: 'Notes' },
+  { id: 'quiz', icon: 'help-circle', iconOutline: 'help-circle-outline', label: 'Quiz' },
+  { id: 'progress', icon: 'stats-chart', iconOutline: 'stats-chart-outline', label: 'Progress' },
+];
+
+export function BottomNav({
+  active,
+  onChange,
+}: {
+  active: BottomTabId;
+  onChange: (t: BottomTabId) => void;
+}) {
   return (
     <View style={styles.wrap}>
       {TABS.map((t) => {
         const selected = t.id === active;
         return (
-          <Pressable key={t.id} onPress={() => onChange(t.id)} style={styles.tab}>
+          <Pressable
+            key={t.id}
+            onPress={() => onChange(t.id)}
+            style={styles.tab}
+            accessibilityRole="tab"
+            accessibilityState={{ selected }}
+          >
             <Ionicons
-              name={(selected ? t.icon : `${t.icon}-outline`) as any}
+              name={selected ? t.icon : t.iconOutline}
               size={22}
               color={selected ? Colors.primary : Colors.muted}
             />
@@ -37,7 +58,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     paddingBottom: 22,

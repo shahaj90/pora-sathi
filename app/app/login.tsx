@@ -1,18 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthField } from '../components/AuthField';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
 import { Colors, Radius } from '../constants/theme';
 import { DEMO_USER } from '../constants/demoUser';
 import { useAuth } from '../context/AuthContext';
@@ -26,6 +28,14 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
   const [loading, setLoading] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   const fillDemo = () => {
     setEmail(DEMO_USER.email);
@@ -42,7 +52,7 @@ export default function Login() {
 
     setLoading(true);
     // Simulated network delay — login() checks the demo credentials.
-    setTimeout(() => {
+    timer.current = setTimeout(() => {
       const formError = login(email, password);
       setLoading(false);
       if (formError) {
@@ -77,7 +87,7 @@ export default function Login() {
             <Text style={styles.heroSub}>Log in to continue learning with Pora Sathi</Text>
           </LinearGradient>
 
-          <View style={styles.card}>
+          <Card radius={Radius.lg} padding={18} style={styles.card}>
             <AuthField
               label="Email"
               value={email}
@@ -110,19 +120,20 @@ export default function Login() {
               </View>
             ) : null}
 
-            <Pressable
+            <Button
+              title={loading ? 'Logging in…' : 'Log In'}
               onPress={submit}
-              disabled={loading}
-              style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
-            >
-              <Text style={styles.btnText}>{loading ? 'Logging in…' : 'Log In'}</Text>
-              {!loading ? <Ionicons name="arrow-forward" size={18} color="#fff" /> : null}
-            </Pressable>
+              loading={loading}
+              icon="arrow-forward"
+              style={styles.submit}
+            />
 
-            <Pressable onPress={fillDemo} style={styles.demoBtn}>
-              <Ionicons name="sparkles-outline" size={16} color={Colors.primary} />
-              <Text style={styles.demoText}>Use demo account ({DEMO_USER.email})</Text>
-            </Pressable>
+            <Button
+              title="Use demo account"
+              onPress={fillDemo}
+              variant="soft"
+              icon="sparkles-outline"
+            />
 
             <View style={styles.switchRow}>
               <Text style={styles.switchText}>New here? </Text>
@@ -134,7 +145,7 @@ export default function Login() {
             <Pressable onPress={() => router.replace('/')} style={styles.guest}>
               <Text style={styles.guestText}>Continue as guest</Text>
             </Pressable>
-          </View>
+          </Card>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -142,7 +153,7 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#6C3CE0' },
+  safe: { flex: 1, backgroundColor: Colors.primary },
   flex: { flex: 1 },
   scroll: { flexGrow: 1, backgroundColor: Colors.background },
   hero: {
@@ -157,56 +168,29 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
-  heroTitle: { color: '#fff', fontSize: 24, fontWeight: '900' },
+  heroTitle: { color: Colors.surface, fontSize: 24, fontWeight: '900' },
   heroSub: { color: 'rgba(255,255,255,0.85)', fontSize: 13, marginTop: 4, textAlign: 'center' },
   card: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.lg,
     marginHorizontal: 16,
     marginTop: -36,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
-  btn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: Colors.primary,
-    borderRadius: 999,
-    paddingVertical: 14,
-    marginTop: 6,
-  },
-  btnPressed: { opacity: 0.85 },
-  btnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
+  submit: { marginTop: 6 },
   formError: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FFEDED',
+    backgroundColor: Colors.dangerSoft,
     borderRadius: Radius.md,
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 12,
   },
-  formErrorText: { flex: 1, fontSize: 12.5, color: '#C81E1E', fontWeight: '600' },
-  demoBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: Colors.violetLight,
-    borderRadius: 999,
-    paddingVertical: 12,
-    marginTop: 10,
-  },
-  demoText: { color: Colors.primary, fontSize: 13, fontWeight: '800' },
+  formErrorText: { flex: 1, fontSize: 12.5, color: Colors.dangerText, fontWeight: '600' },
   switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
   switchText: { color: Colors.muted, fontSize: 13 },
   switchLink: { color: Colors.primary, fontSize: 13, fontWeight: '800' },

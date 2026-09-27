@@ -1,15 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import type { Subject } from '../constants/data';
-import { Radius } from '../constants/theme';
+import type { SscBanner, Subject } from '../constants/data';
+import { Colors, Radius, Shadow } from '../constants/theme';
+import { ProgressBar } from './ui/ProgressBar';
 
 export function SubjectGrid({
   subjects,
+  banner,
   onOpen,
+  onResumeSsc,
 }: {
   subjects: Subject[];
+  banner: SscBanner;
   onOpen: (s: Subject) => void;
+  onResumeSsc: () => void;
 }) {
   const { width } = useWindowDimensions();
   const gap = 12;
@@ -35,7 +40,7 @@ export function SubjectGrid({
           >
             <View style={styles.iconRow}>
               <View style={styles.iconBubble}>
-                <Ionicons name={s.icon as any} size={20} color="#fff" />
+                <Ionicons name={s.icon} size={20} color={Colors.surface} />
               </View>
               <Text style={styles.bangla}>{s.bangla}</Text>
             </View>
@@ -43,30 +48,41 @@ export function SubjectGrid({
             <Text style={styles.meta}>
               {s.chapters} chapters · {s.notesCount} PDFs
             </Text>
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${Math.round(s.progress * 100)}%` }]} />
+            <View style={styles.progressWrap}>
+              <ProgressBar
+                value={s.progress}
+                color={Colors.surface}
+                trackColor="rgba(255,255,255,0.3)"
+              />
             </View>
             <Text style={styles.progressText}>{Math.round(s.progress * 100)}% done</Text>
           </LinearGradient>
         </Pressable>
       ))}
       {/* SSC prep wide card */}
-      <LinearGradient
-        colors={['#191A2E', '#4B21B8']}
-        style={[styles.sscCard, { width: width - 32 }]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      <Pressable
+        onPress={onResumeSsc}
+        accessibilityRole="button"
+        accessibilityLabel="Resume SSC crash course"
+        style={({ pressed }) => [{ width: width - 32, opacity: pressed ? 0.92 : 1 }]}
       >
-        <View>
-          <Text style={styles.sscTag}>SSC 2027 · 214 DAYS LEFT</Text>
-          <Text style={styles.sscTitle}>SSC Crash Course + Model Tests</Text>
-          <Text style={styles.sscSub}>All subjects · 12 model tests · AI evaluation</Text>
-        </View>
-        <View style={styles.sscBtn}>
-          <Text style={styles.sscBtnText}>Resume</Text>
-          <Ionicons name="arrow-forward" size={16} color="#191A2E" />
-        </View>
-      </LinearGradient>
+        <LinearGradient
+          colors={[Colors.text, Colors.primaryDark]}
+          style={styles.sscCard}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.fill}>
+            <Text style={styles.sscTag}>{banner.tag}</Text>
+            <Text style={styles.sscTitle}>{banner.title}</Text>
+            <Text style={styles.sscSub}>{banner.subtitle}</Text>
+          </View>
+          <View style={styles.sscBtn}>
+            <Text style={styles.sscBtnText}>{banner.action}</Text>
+            <Ionicons name="arrow-forward" size={16} color={Colors.text} />
+          </View>
+        </LinearGradient>
+      </Pressable>
     </View>
   );
 }
@@ -79,11 +95,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   cardWrap: { borderRadius: Radius.lg },
+  fill: { flex: 1 },
   card: {
     borderRadius: Radius.lg,
     padding: 14,
     minHeight: 158,
     justifyContent: 'space-between',
+    ...Shadow.card,
   },
   iconRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   iconBubble: {
@@ -95,17 +113,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bangla: { color: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: '600' },
-  name: { color: '#fff', fontSize: 16, fontWeight: '800', marginTop: 12 },
+  name: { color: Colors.surface, fontSize: 16, fontWeight: '800', marginTop: 12 },
   meta: { color: 'rgba(255,255,255,0.85)', fontSize: 11, marginTop: 2 },
-  progressTrack: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    marginTop: 10,
-    overflow: 'hidden',
-  },
-  progressFill: { height: 6, borderRadius: 3, backgroundColor: '#fff' },
-  progressText: { color: '#fff', fontSize: 11, fontWeight: '700', marginTop: 6 },
+  progressWrap: { marginTop: 10 },
+  progressText: { color: Colors.surface, fontSize: 11, fontWeight: '700', marginTop: 6 },
   sscCard: {
     borderRadius: Radius.lg,
     padding: 16,
@@ -114,17 +125,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
-  sscTag: { color: '#FFC531', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
-  sscTitle: { color: '#fff', fontSize: 16, fontWeight: '800', marginTop: 4 },
+  sscTag: { color: Colors.yellow, fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+  sscTitle: { color: Colors.surface, fontSize: 16, fontWeight: '800', marginTop: 4 },
   sscSub: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 4 },
   sscBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 999,
   },
-  sscBtnText: { fontWeight: '800', fontSize: 13, color: '#191A2E' },
+  sscBtnText: { fontWeight: '800', fontSize: 13, color: Colors.text },
 });

@@ -1,17 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { Colors, Shadow } from '../constants/theme';
 
 export function ChatFAB({ onPress }: { onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={styles.wrap} accessibilityLabel="Ask AI tutor">
       <LinearGradient
-        colors={['#6C3CE0', '#FF5C8A']}
+        colors={[Colors.primary, Colors.pink]}
         style={styles.grad}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Ionicons name="chatbubble-ellipses" size={26} color="#fff" />
+        <Ionicons name="chatbubble-ellipses" size={26} color={Colors.surface} />
         <Text style={styles.badge}>AI</Text>
       </LinearGradient>
     </Pressable>
@@ -23,11 +24,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 16,
     bottom: 92,
-    shadowColor: '#6C3CE0',
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
+    ...Shadow.pop,
   },
   grad: {
     width: 62,
@@ -40,8 +37,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -2,
     right: -2,
-    backgroundColor: '#FFC531',
-    color: '#191A2E',
+    backgroundColor: Colors.yellow,
+    color: Colors.text,
     fontSize: 9,
     fontWeight: '900',
     paddingHorizontal: 6,

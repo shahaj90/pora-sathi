@@ -10,10 +10,16 @@ Vibrant, clean, responsive Expo (React Native) dashboard UI.
 
 ## Components
 
+Feature components compose primitives from `components/ui/` — no duplicated
+button, card, chip, progress, or empty-state styles:
+
+- `components/ui/` — `Card`, `Button` (primary/soft/loading), `Chip` (selectable pill), `ProgressBar`, `EmptyState`, `SectionHeader`
 - `components/Header.tsx` — gradient header, streak, search, stats + continue card
-- `components/GradeTabs.tsx` — horizontal grade pills + section header
+- `components/GradeTabs.tsx` — horizontal grade pills (built on `Chip`)
 - `components/SubjectGrid.tsx` — responsive 2-col subject cards + SSC crash-course banner
-- `components/Library.tsx` — PDF notes grid + quiz list
+- `components/Library.tsx` — PDF notes grid + quiz list (built on `Card`)
+- `components/ProgressSection.tsx` — overall + per-subject progress (built on `Card` + `ProgressBar`)
+- `components/AuthField.tsx` — labeled input with icon, error, show/hide password
 - `components/ChatFAB.tsx` — floating AI chat button
 - `components/BottomNav.tsx` — Home / Notes / Quiz / Progress
 

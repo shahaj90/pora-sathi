@@ -1,20 +1,16 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-import { BottomNav } from '../components/BottomNav';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { BottomNav, type BottomTabId } from '../components/BottomNav';
 import { ChatFAB } from '../components/ChatFAB';
-import { SectionHeader, GradeTabs } from '../components/GradeTabs';
+import { GradeTabs } from '../components/GradeTabs';
 import { ContinueCard, HomeHeader } from '../components/Header';
 import { NotesSection, QuizSection } from '../components/Library';
+import { ProgressSection } from '../components/ProgressSection';
 import { SubjectGrid } from '../components/SubjectGrid';
+import { EmptyState } from '../components/ui/EmptyState';
+import { SectionHeader } from '../components/ui/SectionHeader';
 import type {
   ContinueLearning,
   DashboardStats,
@@ -22,6 +18,7 @@ import type {
   GradeId,
   Note,
   Quiz,
+  SscBanner,
   Subject,
 } from '../constants/data';
 import { Colors } from '../constants/theme';
@@ -38,7 +35,8 @@ export default function Dashboard() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [grade, setGrade] = useState<GradeId>('c10');
-  const [tab, setTab] = useState('home');
+  const [view, setView] = useState<BottomTabId>('home');
+  const [query, setQuery] = useState('');
 
   const [grades, setGrades] = useState<Grade[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -46,17 +44,18 @@ export default function Dashboard() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [continueItem, setContinueItem] = useState<ContinueLearning | null>(null);
+  const [banner, setBanner] = useState<SscBanner | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async (gradeId: GradeId, initial: boolean) => {
+  // TODO(api): accept a gradeId and request per-grade content,
+  // e.g. GET /subjects?grade=c10
+  const load = useCallback(async (initial: boolean) => {
     if (initial) setLoading(true);
     else setRefreshing(true);
     setError(null);
     try {
-      // TODO(api): pass gradeId as query param, e.g. GET /subjects?grade=c10
-      void gradeId;
       const [g, s, n, q, meta] = await Promise.all([
         fetchGrades(),
         fetchSubjects(),
@@ -70,6 +69,7 @@ export default function Dashboard() {
       setQuizzes(q);
       setStats(meta.stats);
       setContinueItem(meta.continue);
+      setBanner(meta.sscBanner);
     } catch {
       setError('Could not load dashboard data. Check your connection and retry.');
     } finally {
@@ -79,15 +79,41 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    load('c10', true);
+    load(true);
   }, [load]);
 
   const changeGrade = (g: GradeId) => {
     setGrade(g);
-    load(g, false);
+    load(false);
   };
 
+  const q = query.trim().toLowerCase();
+  const filteredSubjects = useMemo(
+    () =>
+      q
+        ? subjects.filter(
+            (s) => s.name.toLowerCase().includes(q) || s.bangla.toLowerCase().includes(q),
+          )
+        : subjects,
+    [subjects, q],
+  );
+  const filteredNotes = useMemo(
+    () =>
+      q
+        ? notes.filter(
+            (n) => n.title.toLowerCase().includes(q) || n.chapter.toLowerCase().includes(q),
+          )
+        : notes,
+    [notes, q],
+  );
+  const filteredQuizzes = useMemo(
+    () => (q ? quizzes.filter((t) => t.title.toLowerCase().includes(q)) : quizzes),
+    [quizzes, q],
+  );
+
   const openSubject = (s: Subject) => router.push(`/subject/${s.id}?grade=${grade}`);
+  const openNote = (n: Note) => router.push(`/subject/${n.subjectId}?grade=${grade}`);
+  const openQuiz = (t: Quiz) => router.push(`/subject/${t.subjectId}?grade=${grade}&tab=quiz`);
   const openChat = () => router.push('/chat');
   const handleLogout = () => {
     logout();
@@ -105,18 +131,22 @@ export default function Dashboard() {
     );
   }
 
-  if (error || !stats || !continueItem) {
+  if (error || !stats || !continueItem || !banner) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}>
-          <Text style={styles.centerText}>{error ?? 'Something went wrong.'}</Text>
-          <Pressable onPress={() => load(grade, true)} style={styles.retry}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
+          <EmptyState
+            title="Couldn't load your dashboard"
+            subtitle={error ?? 'Something went wrong.'}
+            actionTitle="Retry"
+            onAction={() => load(true)}
+          />
         </View>
       </SafeAreaView>
     );
   }
+
+  const searching = q.length > 0;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -126,6 +156,10 @@ export default function Dashboard() {
             name={user?.name ?? 'Guest'}
             grades={user?.grades ?? ['Class 10']}
             stats={stats}
+            query={query}
+            onQueryChange={setQuery}
+            onMic={openChat}
+            onStreak={() => setView('progress')}
             onLogout={handleLogout}
           />
           <View style={styles.gradeWrap}>
@@ -136,29 +170,114 @@ export default function Dashboard() {
             <ActivityIndicator size="small" color={Colors.primary} style={styles.refresh} />
           ) : null}
 
-          <ContinueCard item={continueItem} onAsk={openChat} />
+          {searching ? (
+            <View>
+              <SectionHeader
+                title={`Results for "${query.trim()}"`}
+                bangla={`${filteredSubjects.length + filteredNotes.length + filteredQuizzes.length} matches`}
+              />
+              {filteredSubjects.length > 0 ? (
+                <View>
+                  <SectionHeader title="Subjects" />
+                  <SubjectGrid
+                    subjects={filteredSubjects}
+                    banner={banner}
+                    onOpen={openSubject}
+                    onResumeSsc={openChat}
+                  />
+                </View>
+              ) : null}
+              {filteredNotes.length > 0 ? (
+                <View>
+                  <SectionHeader title="PDF Notes" />
+                  <NotesSection notes={filteredNotes} onOpen={openNote} />
+                </View>
+              ) : null}
+              {filteredQuizzes.length > 0 ? (
+                <View>
+                  <SectionHeader title="Quizzes" />
+                  <QuizSection quizzes={filteredQuizzes} onPlay={openQuiz} />
+                </View>
+              ) : null}
+              {filteredSubjects.length === 0 &&
+              filteredNotes.length === 0 &&
+              filteredQuizzes.length === 0 ? (
+                <EmptyState
+                  icon="search-outline"
+                  title="No matches found"
+                  subtitle="Try another topic or ask the AI tutor for help."
+                  actionTitle="Ask AI tutor"
+                  onAction={openChat}
+                />
+              ) : null}
+            </View>
+          ) : null}
 
-          <SectionHeader title="Subjects" bangla="বিষয়সমূহ" action="See all" />
-          <SubjectGrid subjects={subjects} onOpen={openSubject} />
+          {!searching && view === 'home' ? (
+            <View>
+              <ContinueCard item={continueItem} onAsk={openChat} />
+              <SectionHeader
+                title="Subjects"
+                bangla="বিষয়সমূহ"
+                action="See all"
+                onAction={() => setView('progress')}
+              />
+              <SubjectGrid
+                subjects={subjects}
+                banner={banner}
+                onOpen={openSubject}
+                onResumeSsc={openChat}
+              />
+              <SectionHeader
+                title="PDF Notes"
+                bangla="পিডিএফ নোট"
+                action="View all"
+                onAction={() => setView('notes')}
+              />
+              <NotesSection notes={notes} onOpen={openNote} />
+              <SectionHeader
+                title="Interactive Quizzes"
+                bangla="কুইজ"
+                action="View all"
+                onAction={() => setView('quiz')}
+              />
+              <QuizSection quizzes={quizzes} onPlay={openQuiz} />
+            </View>
+          ) : null}
 
-          <SectionHeader title="PDF Notes" bangla="পিডিএফ নোট" action="View all" />
-          <NotesSection notes={notes} />
+          {!searching && view === 'notes' ? (
+            <View>
+              <SectionHeader title="All PDF Notes" bangla="সব পিডিএফ নোট" />
+              <NotesSection notes={notes} onOpen={openNote} />
+            </View>
+          ) : null}
 
-          <SectionHeader title="Interactive Quizzes" bangla="কুইজ" action="View all" />
-          <QuizSection quizzes={quizzes} />
+          {!searching && view === 'quiz' ? (
+            <View>
+              <SectionHeader title="All Quizzes" bangla="সব কুইজ" />
+              <QuizSection quizzes={quizzes} onPlay={openQuiz} />
+            </View>
+          ) : null}
 
-          <View style={{ height: 140 }} />
+          {!searching && view === 'progress' ? (
+            <View>
+              <SectionHeader title="Your Progress" bangla="অগ্রগতি" />
+              <ProgressSection subjects={subjects} onOpen={openSubject} />
+            </View>
+          ) : null}
+
+          <View style={styles.spacer} />
         </ScrollView>
 
         <ChatFAB onPress={openChat} />
-        <BottomNav active={tab} onChange={setTab} />
+        <BottomNav active={view} onChange={setView} />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#6C3CE0' },
+  safe: { flex: 1, backgroundColor: Colors.primary },
   container: { flex: 1, backgroundColor: Colors.background },
   scroll: { paddingBottom: 8 },
   gradeWrap: { marginTop: 12 },
@@ -171,12 +290,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   centerText: { fontSize: 14, color: Colors.muted, textAlign: 'center' },
-  retry: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 999,
-  },
-  retryText: { color: '#fff', fontWeight: '800', fontSize: 14 },
   refresh: { marginTop: 8 },
+  spacer: { height: 140 },
 });

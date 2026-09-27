@@ -1,18 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthField } from '../components/AuthField';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { Chip } from '../components/ui/Chip';
 import { Colors, Radius } from '../constants/theme';
 import { type Grade, type GradeId } from '../constants/data';
 import { useAuth } from '../context/AuthContext';
@@ -36,6 +39,14 @@ export default function Signup() {
     grades?: string;
   }>({});
   const [loading, setLoading] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   const clear = (key: keyof typeof errors) => setErrors((e) => ({ ...e, [key]: undefined }));
 
@@ -55,7 +66,7 @@ export default function Signup() {
 
     // Mock signup — register() creates a local session.
     setLoading(true);
-    setTimeout(() => {
+    timer.current = setTimeout(() => {
       register(email, gradeIds);
       setLoading(false);
       router.replace('/');
@@ -74,7 +85,7 @@ export default function Signup() {
           keyboardShouldPersistTaps="handled"
         >
           <LinearGradient
-            colors={['#FF5C8A', '#FF8A3D']}
+            colors={[Colors.pink, Colors.accent]}
             style={styles.hero}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -86,7 +97,7 @@ export default function Signup() {
             <Text style={styles.heroSub}>Create an account for Classes 5–10 + SSC prep</Text>
           </LinearGradient>
 
-          <View style={styles.card}>
+          <Card radius={Radius.lg} padding={18} style={styles.card}>
             <AuthField
               label="Email"
               value={email}
@@ -127,35 +138,25 @@ export default function Signup() {
             <View style={styles.gradeWrap}>
               <Text style={styles.gradeLabel}>Class (select one or more)</Text>
               <View style={styles.chips}>
-                {GRADES.map((g) => {
-                  const selected = gradeIds.includes(g.id);
-                  return (
-                    <Pressable
-                      key={g.id}
-                      onPress={() => toggleGrade(g.id)}
-                      accessibilityRole="checkbox"
-                      accessibilityState={{ checked: selected }}
-                      style={[styles.chip, selected && styles.chipActive]}
-                    >
-                      {selected ? <Ionicons name="checkmark" size={14} color="#fff" /> : null}
-                      <Text style={[styles.chipText, selected && styles.chipTextActive]}>
-                        {g.label}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+                {GRADES.map((g) => (
+                  <Chip
+                    key={g.id}
+                    label={g.label}
+                    selected={gradeIds.includes(g.id)}
+                    onToggle={() => toggleGrade(g.id)}
+                  />
+                ))}
               </View>
               {errors.grades ? <Text style={styles.error}>{errors.grades}</Text> : null}
             </View>
 
-            <Pressable
+            <Button
+              title={loading ? 'Creating account…' : 'Sign Up'}
               onPress={submit}
-              disabled={loading}
-              style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
-            >
-              <Text style={styles.btnText}>{loading ? 'Creating account…' : 'Sign Up'}</Text>
-              {!loading ? <Ionicons name="arrow-forward" size={18} color="#fff" /> : null}
-            </Pressable>
+              loading={loading}
+              icon="arrow-forward"
+              style={styles.submit}
+            />
 
             <View style={styles.switchRow}>
               <Text style={styles.switchText}>Already have an account? </Text>
@@ -167,7 +168,7 @@ export default function Signup() {
             <Pressable onPress={() => router.replace('/')} style={styles.guest}>
               <Text style={styles.guestText}>Continue as guest</Text>
             </Pressable>
-          </View>
+          </Card>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -175,7 +176,7 @@ export default function Signup() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FF5C8A' },
+  safe: { flex: 1, backgroundColor: Colors.pink },
   flex: { flex: 1 },
   scroll: { flexGrow: 1, backgroundColor: Colors.background },
   hero: {
@@ -190,52 +191,22 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 20,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
-  heroTitle: { color: '#fff', fontSize: 24, fontWeight: '900' },
+  heroTitle: { color: Colors.surface, fontSize: 24, fontWeight: '900' },
   heroSub: { color: 'rgba(255,255,255,0.9)', fontSize: 13, marginTop: 4, textAlign: 'center' },
   card: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.lg,
     marginHorizontal: 16,
     marginTop: -36,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
-  btn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: Colors.primary,
-    borderRadius: 999,
-    paddingVertical: 14,
-    marginTop: 6,
-  },
-  btnPressed: { opacity: 0.85 },
-  btnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
   gradeWrap: { marginBottom: 14 },
   gradeLabel: { fontSize: 13, fontWeight: '700', color: Colors.text, marginBottom: 8 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 999,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  chipText: { fontSize: 13, fontWeight: '700', color: Colors.muted },
-  chipTextActive: { color: '#fff' },
-  error: { fontSize: 12, color: '#FF5C5C', marginTop: 6, fontWeight: '600' },
+  submit: { marginTop: 6 },
+  error: { fontSize: 12, color: Colors.danger, marginTop: 6, fontWeight: '600' },
   switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
   switchText: { color: Colors.muted, fontSize: 13 },
   switchLink: { color: Colors.primary, fontSize: 13, fontWeight: '800' },

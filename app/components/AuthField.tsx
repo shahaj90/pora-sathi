@@ -38,6 +38,7 @@ export function AuthField({
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor={Colors.muted}
+          accessibilityLabel={label}
           style={styles.input}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: Radius.md,
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     minHeight: 52,
   },
-  inputError: { borderColor: '#FF5C5C' },
+  inputError: { borderColor: Colors.danger },
   input: { flex: 1, fontSize: 15, color: Colors.text, paddingVertical: 10 },
-  error: { fontSize: 12, color: '#FF5C5C', marginTop: 4, fontWeight: '600' },
+  error: { fontSize: 12, color: Colors.danger, marginTop: 4, fontWeight: '600' },
 });
