@@ -3,7 +3,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors, Radius } from '../constants/theme';
 
-export function HomeHeader() {
+export function HomeHeader({
+  name,
+  grade,
+  onLogout,
+}: {
+  name: string;
+  grade: string;
+  onLogout: () => void;
+}) {
   return (
     <LinearGradient
       colors={['#6C3CE0', '#8B5CF6', '#B794FF']}
@@ -14,11 +22,13 @@ export function HomeHeader() {
       <View style={styles.topRow}>
         <View style={styles.profileRow}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>আ</Text>
+            <Text style={styles.avatarText}>{name.charAt(0).toUpperCase()}</Text>
           </View>
           <View>
             <Text style={styles.hello}>Assalamu Alaikum 👋</Text>
-            <Text style={styles.name}>Arif Hasan · Class 10</Text>
+            <Text style={styles.name}>
+              {name} · {grade}
+            </Text>
           </View>
         </View>
         <View style={styles.iconRow}>
@@ -26,8 +36,13 @@ export function HomeHeader() {
             <Ionicons name="flame" size={18} color="#FF8A3D" />
             <Text style={styles.streak}>12</Text>
           </Pressable>
-          <Pressable style={styles.iconBtn}>
-            <Ionicons name="notifications-outline" size={18} color="#191A2E" />
+          <Pressable
+            style={styles.iconBtn}
+            onPress={onLogout}
+            accessibilityLabel="Log out"
+            accessibilityRole="button"
+          >
+            <Ionicons name="log-out-outline" size={18} color={Colors.primary} />
           </Pressable>
         </View>
       </View>

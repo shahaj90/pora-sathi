@@ -9,9 +9,11 @@ import { NotesSection, QuizSection } from '../components/Library';
 import { SubjectGrid } from '../components/SubjectGrid';
 import { SUBJECTS, type GradeId, type Subject } from '../constants/data';
 import { Colors } from '../constants/theme';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
   const router = useRouter();
+  const { user, logout } = useAuth();
   const [grade, setGrade] = useState<GradeId>('c10');
   const [tab, setTab] = useState('home');
 
@@ -20,12 +22,20 @@ export default function Dashboard() {
 
   const openSubject = (s: Subject) => router.push(`/subject/${s.id}?grade=${grade}`);
   const openChat = () => router.push('/chat');
+  const handleLogout = () => {
+    logout();
+    router.replace('/login');
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-          <HomeHeader />
+          <HomeHeader
+            name={user?.name ?? 'Guest'}
+            grade={user?.grade ?? 'Class 10'}
+            onLogout={handleLogout}
+          />
           <View style={styles.gradeWrap}>
             <GradeTabs active={grade} onChange={setGrade} />
           </View>
