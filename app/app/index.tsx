@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNav, type BottomTabId } from '../components/BottomNav';
 import { ChatFAB } from '../components/ChatFAB';
+import { ContentSkeleton, DashboardSkeleton } from '../components/DashboardSkeleton';
 import { GradeTabs } from '../components/GradeTabs';
 import { ContinueCard, HomeHeader } from '../components/Header';
 import { NotesSection, QuizSection } from '../components/Library';
@@ -48,12 +49,17 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [gradeChanging, setGradeChanging] = useState(false);
 
   // TODO(api): accept a gradeId and request per-grade content,
   // e.g. GET /subjects?grade=c10
   const load = useCallback(async (initial: boolean) => {
-    if (initial) setLoading(true);
-    else setRefreshing(true);
+    if (initial) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+      setGradeChanging(true);
+    }
     setError(null);
     try {
       const [g, s, n, q, meta] = await Promise.all([
@@ -75,6 +81,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setGradeChanging(false);
     }
   }, []);
 
@@ -121,14 +128,7 @@ export default function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.centerText}>Loading your dashboard…</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (error || !stats || !continueItem || !banner) {
@@ -170,101 +170,107 @@ export default function Dashboard() {
             <ActivityIndicator size="small" color={Colors.primary} style={styles.refresh} />
           ) : null}
 
-          {searching ? (
-            <View>
-              <SectionHeader
-                title={`Results for "${query.trim()}"`}
-                bangla={`${filteredSubjects.length + filteredNotes.length + filteredQuizzes.length} matches`}
-              />
-              {filteredSubjects.length > 0 ? (
+          {gradeChanging ? (
+            <ContentSkeleton />
+          ) : (
+            <>
+              {searching ? (
                 <View>
-                  <SectionHeader title="Subjects" />
+                  <SectionHeader
+                    title={`Results for "${query.trim()}"`}
+                    bangla={`${filteredSubjects.length + filteredNotes.length + filteredQuizzes.length} matches`}
+                  />
+                  {filteredSubjects.length > 0 ? (
+                    <View>
+                      <SectionHeader title="Subjects" />
+                      <SubjectGrid
+                        subjects={filteredSubjects}
+                        banner={banner}
+                        onOpen={openSubject}
+                        onResumeSsc={openChat}
+                      />
+                    </View>
+                  ) : null}
+                  {filteredNotes.length > 0 ? (
+                    <View>
+                      <SectionHeader title="PDF Notes" />
+                      <NotesSection notes={filteredNotes} onOpen={openNote} />
+                    </View>
+                  ) : null}
+                  {filteredQuizzes.length > 0 ? (
+                    <View>
+                      <SectionHeader title="Quizzes" />
+                      <QuizSection quizzes={filteredQuizzes} onPlay={openQuiz} />
+                    </View>
+                  ) : null}
+                  {filteredSubjects.length === 0 &&
+                  filteredNotes.length === 0 &&
+                  filteredQuizzes.length === 0 ? (
+                    <EmptyState
+                      icon="search-outline"
+                      title="No matches found"
+                      subtitle="Try another topic or ask the AI tutor for help."
+                      actionTitle="Ask AI tutor"
+                      onAction={openChat}
+                    />
+                  ) : null}
+                </View>
+              ) : null}
+
+              {!searching && view === 'home' ? (
+                <View>
+                  <ContinueCard item={continueItem} onAsk={openChat} />
+                  <SectionHeader
+                    title="Subjects"
+                    bangla="বিষয়সমূহ"
+                    action="See all"
+                    onAction={() => setView('progress')}
+                  />
                   <SubjectGrid
-                    subjects={filteredSubjects}
+                    subjects={subjects}
                     banner={banner}
                     onOpen={openSubject}
                     onResumeSsc={openChat}
                   />
+                  <SectionHeader
+                    title="PDF Notes"
+                    bangla="পিডিএফ নোট"
+                    action="View all"
+                    onAction={() => setView('notes')}
+                  />
+                  <NotesSection notes={notes} onOpen={openNote} />
+                  <SectionHeader
+                    title="Interactive Quizzes"
+                    bangla="কুইজ"
+                    action="View all"
+                    onAction={() => setView('quiz')}
+                  />
+                  <QuizSection quizzes={quizzes} onPlay={openQuiz} />
                 </View>
               ) : null}
-              {filteredNotes.length > 0 ? (
+
+              {!searching && view === 'notes' ? (
                 <View>
-                  <SectionHeader title="PDF Notes" />
-                  <NotesSection notes={filteredNotes} onOpen={openNote} />
+                  <SectionHeader title="All PDF Notes" bangla="সব পিডিএফ নোট" />
+                  <NotesSection notes={notes} onOpen={openNote} />
                 </View>
               ) : null}
-              {filteredQuizzes.length > 0 ? (
+
+              {!searching && view === 'quiz' ? (
                 <View>
-                  <SectionHeader title="Quizzes" />
-                  <QuizSection quizzes={filteredQuizzes} onPlay={openQuiz} />
+                  <SectionHeader title="All Quizzes" bangla="সব কুইজ" />
+                  <QuizSection quizzes={quizzes} onPlay={openQuiz} />
                 </View>
               ) : null}
-              {filteredSubjects.length === 0 &&
-              filteredNotes.length === 0 &&
-              filteredQuizzes.length === 0 ? (
-                <EmptyState
-                  icon="search-outline"
-                  title="No matches found"
-                  subtitle="Try another topic or ask the AI tutor for help."
-                  actionTitle="Ask AI tutor"
-                  onAction={openChat}
-                />
+
+              {!searching && view === 'progress' ? (
+                <View>
+                  <SectionHeader title="Your Progress" bangla="অগ্রগতি" />
+                  <ProgressSection subjects={subjects} onOpen={openSubject} />
+                </View>
               ) : null}
-            </View>
-          ) : null}
-
-          {!searching && view === 'home' ? (
-            <View>
-              <ContinueCard item={continueItem} onAsk={openChat} />
-              <SectionHeader
-                title="Subjects"
-                bangla="বিষয়সমূহ"
-                action="See all"
-                onAction={() => setView('progress')}
-              />
-              <SubjectGrid
-                subjects={subjects}
-                banner={banner}
-                onOpen={openSubject}
-                onResumeSsc={openChat}
-              />
-              <SectionHeader
-                title="PDF Notes"
-                bangla="পিডিএফ নোট"
-                action="View all"
-                onAction={() => setView('notes')}
-              />
-              <NotesSection notes={notes} onOpen={openNote} />
-              <SectionHeader
-                title="Interactive Quizzes"
-                bangla="কুইজ"
-                action="View all"
-                onAction={() => setView('quiz')}
-              />
-              <QuizSection quizzes={quizzes} onPlay={openQuiz} />
-            </View>
-          ) : null}
-
-          {!searching && view === 'notes' ? (
-            <View>
-              <SectionHeader title="All PDF Notes" bangla="সব পিডিএফ নোট" />
-              <NotesSection notes={notes} onOpen={openNote} />
-            </View>
-          ) : null}
-
-          {!searching && view === 'quiz' ? (
-            <View>
-              <SectionHeader title="All Quizzes" bangla="সব কুইজ" />
-              <QuizSection quizzes={quizzes} onPlay={openQuiz} />
-            </View>
-          ) : null}
-
-          {!searching && view === 'progress' ? (
-            <View>
-              <SectionHeader title="Your Progress" bangla="অগ্রগতি" />
-              <ProgressSection subjects={subjects} onOpen={openSubject} />
-            </View>
-          ) : null}
+            </>
+          )}
 
           <View style={styles.spacer} />
         </ScrollView>
@@ -289,7 +295,13 @@ const styles = StyleSheet.create({
     gap: 12,
     padding: 24,
   },
-  centerText: { fontSize: 14, color: Colors.textSecondary, textAlign: 'center' },
+  retry: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 999,
+  },
+  retryText: { color: Colors.surface, fontWeight: '800', fontSize: 14 },
   refresh: { marginTop: 8 },
   spacer: { height: 140 },
 });
