@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../constants/theme';
+import { Pressable, Text, View } from 'react-native';
+import { useColors } from '../../context/ColorSchemeContext';
 
 interface Props {
   title: string;
@@ -10,31 +10,29 @@ interface Props {
 
 /** Shared section heading with optional trailing link. */
 export function SectionHeader({ title, bangla, action, onAction }: Props) {
+  const { colors: C } = useColors();
   return (
-    <View style={styles.wrap}>
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        paddingHorizontal: 16,
+        marginTop: 22,
+        marginBottom: 12,
+      }}
+    >
       <View>
-        <Text style={styles.title}>{title}</Text>
-        {bangla ? <Text style={styles.bangla}>{bangla}</Text> : null}
+        <Text style={{ fontSize: 17, fontWeight: '800', color: C.text }}>{title}</Text>
+        {bangla ? (
+          <Text style={{ fontSize: 12, color: C.textSecondary, marginTop: 2 }}>{bangla}</Text>
+        ) : null}
       </View>
       {action ? (
         <Pressable onPress={onAction} accessibilityRole="button" hitSlop={8}>
-          <Text style={styles.action}>{action}</Text>
+          <Text style={{ fontSize: 13, fontWeight: '700', color: C.accent }}>{action}</Text>
         </Pressable>
       ) : null}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    marginTop: 22,
-    marginBottom: 12,
-  },
-  title: { fontSize: 17, fontWeight: '800', color: Colors.text },
-  bangla: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-  action: { fontSize: 13, fontWeight: '700', color: Colors.accent },
-});

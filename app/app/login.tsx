@@ -12,16 +12,18 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AuthField } from '../components/AuthField';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Colors, Gradients, Radius } from '../constants/theme';
+import { FormField } from '../components/ui/FormField';
+import { Gradients, Radius } from '../constants/theme';
 import { DEMO_USER } from '../constants/demoUser';
 import { useAuth } from '../context/AuthContext';
+import { useColors } from '../context/ColorSchemeContext';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login() {
+  const { colors: C } = useColors();
   const router = useRouter();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
@@ -63,32 +65,31 @@ export default function Login() {
     }, 600);
   };
 
+  const s = makeStyles(C);
+
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+    <SafeAreaView style={s.safe}>
+      <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={s.scroll}
           keyboardShouldPersistTaps="handled"
         >
           <LinearGradient
             colors={Gradients.header}
-            style={styles.hero}
+            style={s.hero}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <View style={styles.logo}>
-              <Ionicons name="school" size={28} color={Colors.primary} />
+            <View style={s.logo}>
+              <Ionicons name="school" size={28} color={C.primary} />
             </View>
-            <Text style={styles.heroTitle}>Welcome back!</Text>
-            <Text style={styles.heroSub}>Log in to continue learning with Pora Sathi</Text>
+            <Text style={s.heroTitle}>Welcome back!</Text>
+            <Text style={s.heroSub}>Log in to continue learning with Pora Sathi</Text>
           </LinearGradient>
 
-          <Card radius={Radius.lg} padding={18} style={styles.card}>
-            <AuthField
+          <Card radius={Radius.lg} padding={18} style={s.card}>
+            <FormField
               label="Email"
               value={email}
               onChangeText={(t) => {
@@ -99,8 +100,9 @@ export default function Login() {
               icon="mail-outline"
               error={errors.email}
               keyboardType="email-address"
+              autoCapitalize="none"
             />
-            <AuthField
+            <FormField
               label="Password"
               value={password}
               onChangeText={(t) => {
@@ -110,13 +112,13 @@ export default function Login() {
               placeholder="••••••••"
               icon="lock-closed-outline"
               error={errors.password}
-              secure
+              secureTextEntry
             />
 
             {errors.form ? (
-              <View style={styles.formError}>
+              <View style={s.formError}>
                 <Ionicons name="alert-circle-outline" size={16} color="#FF5C5C" />
-                <Text style={styles.formErrorText}>{errors.form}</Text>
+                <Text style={s.formErrorText}>{errors.form}</Text>
               </View>
             ) : null}
 
@@ -125,7 +127,7 @@ export default function Login() {
               onPress={submit}
               loading={loading}
               icon="arrow-forward"
-              style={styles.submit}
+              style={s.submit}
             />
 
             <Button
@@ -135,15 +137,15 @@ export default function Login() {
               icon="sparkles-outline"
             />
 
-            <View style={styles.switchRow}>
-              <Text style={styles.switchText}>New here? </Text>
+            <View style={s.switchRow}>
+              <Text style={s.switchText}>New here? </Text>
               <Pressable onPress={() => router.push('/signup')}>
-                <Text style={styles.switchLink}>Create an account</Text>
+                <Text style={s.switchLink}>Create an account</Text>
               </Pressable>
             </View>
 
-            <Pressable onPress={() => router.replace('/')} style={styles.guest}>
-              <Text style={styles.guestText}>Continue as guest</Text>
+            <Pressable onPress={() => router.replace('/')} style={s.guest}>
+              <Text style={s.guestText}>Continue as guest</Text>
             </Pressable>
           </Card>
         </ScrollView>
@@ -152,55 +154,56 @@ export default function Login() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  flex: { flex: 1 },
-  scroll: { flexGrow: 1, backgroundColor: Colors.background },
-  hero: {
-    paddingTop: 48,
-    paddingBottom: 64,
-    paddingHorizontal: 24,
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
-    alignItems: 'center',
-  },
-  logo: {
-    width: 68,
-    height: 68,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  heroTitle: { color: Colors.surface, fontSize: 26, fontWeight: '900' },
-  heroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 13, marginTop: 6, textAlign: 'center' },
-  card: {
-    marginHorizontal: 16,
-    marginTop: -36,
-  },
-  submit: { marginTop: 6 },
-  formError: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.dangerSoft,
-    borderRadius: Radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 12,
-  },
-  formErrorText: { flex: 1, fontSize: 12.5, color: Colors.dangerText, fontWeight: '600' },
-  switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
-  switchText: { color: Colors.textSecondary, fontSize: 13 },
-  switchLink: { color: Colors.primary, fontSize: 13, fontWeight: '800' },
-  guest: { alignItems: 'center', marginTop: 12, paddingVertical: 6 },
-  guestText: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '700',
-    textDecorationLine: 'underline',
-  },
-});
+const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    flex: { flex: 1 },
+    scroll: { flexGrow: 1, backgroundColor: C.background },
+    hero: {
+      paddingTop: 48,
+      paddingBottom: 64,
+      paddingHorizontal: 24,
+      borderBottomLeftRadius: Radius.xl,
+      borderBottomRightRadius: Radius.xl,
+      alignItems: 'center',
+    },
+    logo: {
+      width: 68,
+      height: 68,
+      borderRadius: 22,
+      backgroundColor: 'rgba(255,255,255,0.18)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.3)',
+    },
+    heroTitle: { color: C.surface, fontSize: 26, fontWeight: '900' },
+    heroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 13, marginTop: 6, textAlign: 'center' },
+    card: {
+      marginHorizontal: 16,
+      marginTop: -36,
+    },
+    submit: { marginTop: 6 },
+    formError: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      backgroundColor: C.dangerSoft,
+      borderRadius: Radius.md,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      marginBottom: 12,
+    },
+    formErrorText: { flex: 1, fontSize: 12.5, color: C.dangerText, fontWeight: '600' },
+    switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
+    switchText: { color: C.textSecondary, fontSize: 13 },
+    switchLink: { color: C.primary, fontSize: 13, fontWeight: '800' },
+    guest: { alignItems: 'center', marginTop: 12, paddingVertical: 6 },
+    guestText: {
+      color: C.textSecondary,
+      fontSize: 13,
+      fontWeight: '700',
+      textDecorationLine: 'underline',
+    },
+  });

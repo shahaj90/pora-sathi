@@ -1,142 +1,131 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import type { SscBanner, Subject } from '../constants/data';
-import { Colors, Radius, Shadow } from '../constants/theme';
+import { Pressable, Text, View, useWindowDimensions } from 'react-native';
+import type { Subject } from '../constants/data';
+import { Radius, Shadow } from '../constants/theme';
+import { useColors } from '../context/ColorSchemeContext';
 import { ProgressBar } from './ui/ProgressBar';
 
 export function SubjectGrid({
   subjects,
-  banner,
   onOpen,
-  onResumeSsc,
+  compact = false,
 }: {
   subjects: Subject[];
-  banner: SscBanner;
   onOpen: (s: Subject) => void;
-  onResumeSsc: () => void;
+  /** 3-column compact mode for home; 2-column with stats otherwise */
+  compact?: boolean;
 }) {
+  const { colors: C } = useColors();
   const { width } = useWindowDimensions();
   const gap = 12;
   const padding = 32; // 16 * 2
-  const cardWidth = (width - padding - gap) / 2;
+  const columns = compact ? 3 : 2;
+  const totalGap = gap * (columns - 1);
+  const cardWidth = (width - padding - totalGap) / columns;
 
   return (
-    <View style={styles.grid}>
+    <View style={gridStyle}>
       {subjects.map((s) => (
         <Pressable
           key={s.id}
           onPress={() => onOpen(s)}
-          style={({ pressed }) => [
-            styles.cardWrap,
-            { width: cardWidth, opacity: pressed ? 0.92 : 1 },
-          ]}
+          style={({ pressed }) => [cardWrap, { width: cardWidth, opacity: pressed ? 0.92 : 1 }]}
         >
           <LinearGradient
             colors={s.color}
-            style={styles.card}
+            style={[cardStyle, compact && cardCompact]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <View style={styles.iconRow}>
-              <View style={styles.iconBubble}>
-                <Ionicons name={s.icon} size={20} color={Colors.surface} />
+            <View style={iconRowStyle}>
+              <View style={[iconBubbleStyle, compact && iconBubbleCompact]}>
+                <Ionicons name={s.icon} size={compact ? 18 : 20} color={C.surface} />
               </View>
-              <Text style={styles.bangla}>{s.bangla}</Text>
+              {!compact ? <Text style={banglaStyle}>{s.bangla}</Text> : null}
             </View>
-            <Text style={styles.name}>{s.name}</Text>
-            <Text style={styles.meta}>
-              {s.chapters} chapters · {s.notesCount} PDFs
-            </Text>
-            <View style={styles.progressWrap}>
-              <ProgressBar
-                value={s.progress}
-                color={Colors.surface}
-                trackColor="rgba(255,255,255,0.3)"
-              />
-            </View>
-            <Text style={styles.progressText}>{Math.round(s.progress * 100)}% done</Text>
+            <Text style={[nameStyle, compact && nameCompact]}>{s.name}</Text>
+            {!compact ? (
+              <>
+                <Text style={metaStyle}>
+                  {s.chapters} chapters · {s.notesCount} PDFs
+                </Text>
+                <View style={progressWrap}>
+                  <ProgressBar
+                    value={s.progress}
+                    color={C.surface}
+                    trackColor="rgba(255,255,255,0.3)"
+                  />
+                </View>
+                <Text style={progressTextStyle}>{Math.round(s.progress * 100)}% done</Text>
+              </>
+            ) : null}
           </LinearGradient>
         </Pressable>
       ))}
-      {/* SSC prep wide card */}
-      <Pressable
-        onPress={onResumeSsc}
-        accessibilityRole="button"
-        accessibilityLabel="Resume SSC crash course"
-        style={({ pressed }) => [{ width: width - 32, opacity: pressed ? 0.92 : 1 }]}
-      >
-        <LinearGradient
-          colors={[Colors.text, Colors.primaryDark]}
-          style={styles.sscCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <View style={styles.fill}>
-            <Text style={styles.sscTag}>{banner.tag}</Text>
-            <Text style={styles.sscTitle}>{banner.title}</Text>
-            <Text style={styles.sscSub}>{banner.subtitle}</Text>
-          </View>
-          <View style={styles.sscBtn}>
-            <Text style={styles.sscBtnText}>{banner.action}</Text>
-            <Ionicons name="arrow-forward" size={16} color={Colors.text} />
-          </View>
-        </LinearGradient>
-      </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-  cardWrap: { borderRadius: Radius.lg },
-  fill: { flex: 1 },
-  card: {
-    borderRadius: Radius.lg,
-    padding: 14,
-    minHeight: 158,
-    justifyContent: 'space-between',
-    ...Shadow.card,
-  },
-  iconRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  iconBubble: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bangla: { color: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: '600' },
-  name: { color: Colors.surface, fontSize: 16, fontWeight: '800', marginTop: 12 },
-  meta: { color: 'rgba(255,255,255,0.85)', fontSize: 11, marginTop: 2 },
-  progressWrap: { marginTop: 10 },
-  progressText: { color: Colors.surface, fontSize: 11, fontWeight: '700', marginTop: 6 },
-  sscCard: {
-    borderRadius: Radius.lg,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    ...Shadow.card,
-  },
-  sscTag: { color: Colors.warning, fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
-  sscTitle: { color: Colors.surface, fontSize: 16, fontWeight: '800', marginTop: 4 },
-  sscSub: { color: 'rgba(255,255,255,0.72)', fontSize: 12, marginTop: 4 },
-  sscBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: Colors.accent,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 999,
-  },
-  sscBtnText: { fontWeight: '800', fontSize: 13, color: Colors.surface },
-});
+// Static styles (no dynamic colors needed)
+const gridStyle = {
+  flexDirection: 'row' as const,
+  flexWrap: 'wrap' as const,
+  paddingHorizontal: 16,
+  gap: 12,
+};
+
+const cardWrap = { borderRadius: Radius.lg };
+
+const cardStyle = {
+  borderRadius: Radius.lg,
+  padding: 14,
+  minHeight: 158,
+  justifyContent: 'space-between' as const,
+  ...Shadow.card,
+};
+
+const cardCompact = {
+  padding: 12,
+  minHeight: 112,
+  justifyContent: 'flex-start' as const,
+  gap: 8,
+};
+
+const iconRowStyle = {
+  flexDirection: 'row' as const,
+  justifyContent: 'space-between' as const,
+  alignItems: 'center' as const,
+};
+
+const iconBubbleStyle = {
+  width: 38,
+  height: 38,
+  borderRadius: 19,
+  backgroundColor: 'rgba(255,255,255,0.25)',
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
+
+const iconBubbleCompact = {
+  width: 32,
+  height: 32,
+  borderRadius: 16,
+};
+
+const banglaStyle = { color: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: '600' as const };
+
+const nameStyle = { color: '#FFFFFF', fontSize: 16, fontWeight: '800' as const, marginTop: 12 };
+
+const nameCompact = { color: '#FFFFFF', fontSize: 13, fontWeight: '800' as const, marginTop: 0 };
+
+const metaStyle = { color: 'rgba(255,255,255,0.85)', fontSize: 11, marginTop: 2 };
+
+const progressWrap = { marginTop: 10 };
+
+const progressTextStyle = {
+  color: '#FFFFFF',
+  fontSize: 11,
+  fontWeight: '700' as const,
+  marginTop: 6,
+};

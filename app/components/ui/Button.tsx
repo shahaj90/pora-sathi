@@ -1,13 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  type StyleProp,
-  type ViewStyle,
-} from 'react-native';
-import { Colors, Radius } from '../../constants/theme';
+import { ActivityIndicator, Pressable, Text, type StyleProp, type ViewStyle } from 'react-native';
+import { Radius } from '../../constants/theme';
+import { useColors } from '../../context/ColorSchemeContext';
 
 interface Props {
   title: string;
@@ -27,51 +21,10 @@ export function Button({
   variant = 'primary',
   style,
 }: Props) {
+  const { colors: C } = useColors();
   const disabled = loading;
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      style={({ pressed }) => [
-        styles.base,
-        variant === 'primary' && styles.primary,
-        variant === 'soft' && styles.soft,
-        variant === 'ghost' && styles.ghost,
-        pressed && !disabled && styles.pressed,
-        disabled && styles.disabled,
-        style,
-      ]}
-    >
-      {loading ? (
-        <ActivityIndicator
-          size="small"
-          color={variant === 'primary' ? Colors.surface : Colors.primary}
-        />
-      ) : (
-        <Text
-          style={[
-            styles.text,
-            variant === 'primary' && styles.textPrimary,
-            variant !== 'primary' && styles.textSoft,
-          ]}
-        >
-          {title}
-        </Text>
-      )}
-      {!loading && icon ? (
-        <Ionicons
-          name={icon}
-          size={17}
-          color={variant === 'primary' ? Colors.surface : Colors.primary}
-        />
-      ) : null}
-    </Pressable>
-  );
-}
 
-const styles = StyleSheet.create({
-  base: {
+  const baseStyle: ViewStyle = {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -79,13 +32,39 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
     paddingVertical: 14,
     paddingHorizontal: 20,
-  },
-  primary: { backgroundColor: Colors.primary },
-  soft: { backgroundColor: Colors.primarySoft },
-  ghost: { backgroundColor: 'transparent' },
-  pressed: { opacity: 0.86 },
-  disabled: { opacity: 0.7 },
-  text: { fontSize: 15, fontWeight: '800' },
-  textPrimary: { color: Colors.surface },
-  textSoft: { color: Colors.primary },
-});
+  };
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      style={({ pressed }) => [
+        baseStyle,
+        variant === 'primary' && { backgroundColor: C.primary },
+        variant === 'soft' && { backgroundColor: C.primarySoft },
+        variant === 'ghost' && { backgroundColor: 'transparent' },
+        pressed && !disabled && { opacity: 0.86 },
+        disabled && { opacity: 0.7 },
+        style,
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator size="small" color={variant === 'primary' ? C.surface : C.primary} />
+      ) : (
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: '800',
+            color: variant === 'primary' ? C.surface : C.primary,
+          }}
+        >
+          {title}
+        </Text>
+      )}
+      {!loading && icon ? (
+        <Ionicons name={icon} size={17} color={variant === 'primary' ? C.surface : C.primary} />
+      ) : null}
+    </Pressable>
+  );
+}

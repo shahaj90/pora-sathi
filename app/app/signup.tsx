@@ -12,13 +12,14 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AuthField } from '../components/AuthField';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Chip } from '../components/ui/Chip';
-import { Colors, Gradients, Radius } from '../constants/theme';
+import { FormField } from '../components/ui/FormField';
+import { Gradients, Radius } from '../constants/theme';
 import { type Grade, type GradeId } from '../constants/data';
 import { useAuth } from '../context/AuthContext';
+import { useColors } from '../context/ColorSchemeContext';
 import gradesJson from '../data/grades.json';
 
 const GRADES = gradesJson as Grade[];
@@ -26,6 +27,7 @@ const GRADES = gradesJson as Grade[];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Signup() {
+  const { colors: C } = useColors();
   const router = useRouter();
   const { register } = useAuth();
   const [email, setEmail] = useState('');
@@ -73,32 +75,31 @@ export default function Signup() {
     }, 900);
   };
 
+  const s = makeStyles(C);
+
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+    <SafeAreaView style={s.safe}>
+      <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={s.scroll}
           keyboardShouldPersistTaps="handled"
         >
           <LinearGradient
             colors={Gradients.sunset}
-            style={styles.hero}
+            style={s.hero}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <View style={styles.logo}>
-              <Ionicons name="person-add" size={28} color={Colors.pink} />
+            <View style={s.logo}>
+              <Ionicons name="person-add" size={28} color={C.pink} />
             </View>
-            <Text style={styles.heroTitle}>Join Pora Sathi</Text>
-            <Text style={styles.heroSub}>Create an account for Classes 5–10 + SSC prep</Text>
+            <Text style={s.heroTitle}>Join Pora Sathi</Text>
+            <Text style={s.heroSub}>Create an account for Classes 5–10 + SSC prep</Text>
           </LinearGradient>
 
-          <Card radius={Radius.lg} padding={18} style={styles.card}>
-            <AuthField
+          <Card radius={Radius.lg} padding={18} style={s.card}>
+            <FormField
               label="Email"
               value={email}
               onChangeText={(t) => {
@@ -109,8 +110,9 @@ export default function Signup() {
               icon="mail-outline"
               error={errors.email}
               keyboardType="email-address"
+              autoCapitalize="none"
             />
-            <AuthField
+            <FormField
               label="Password"
               value={password}
               onChangeText={(t) => {
@@ -120,9 +122,9 @@ export default function Signup() {
               placeholder="Min. 6 characters"
               icon="lock-closed-outline"
               error={errors.password}
-              secure
+              secureTextEntry
             />
-            <AuthField
+            <FormField
               label="Confirm password"
               value={confirm}
               onChangeText={(t) => {
@@ -132,12 +134,12 @@ export default function Signup() {
               placeholder="Repeat your password"
               icon="checkmark-circle-outline"
               error={errors.confirm}
-              secure
+              secureTextEntry
             />
 
-            <View style={styles.gradeWrap}>
-              <Text style={styles.gradeLabel}>Class (select one or more)</Text>
-              <View style={styles.chips}>
+            <View style={s.gradeWrap}>
+              <Text style={s.gradeLabel}>Class (select one or more)</Text>
+              <View style={s.chips}>
                 {GRADES.map((g) => (
                   <Chip
                     key={g.id}
@@ -147,7 +149,7 @@ export default function Signup() {
                   />
                 ))}
               </View>
-              {errors.grades ? <Text style={styles.error}>{errors.grades}</Text> : null}
+              {errors.grades ? <Text style={s.error}>{errors.grades}</Text> : null}
             </View>
 
             <Button
@@ -155,18 +157,18 @@ export default function Signup() {
               onPress={submit}
               loading={loading}
               icon="arrow-forward"
-              style={styles.submit}
+              style={s.submit}
             />
 
-            <View style={styles.switchRow}>
-              <Text style={styles.switchText}>Already have an account? </Text>
+            <View style={s.switchRow}>
+              <Text style={s.switchText}>Already have an account? </Text>
               <Pressable onPress={() => router.push('/login')}>
-                <Text style={styles.switchLink}>Log in</Text>
+                <Text style={s.switchLink}>Log in</Text>
               </Pressable>
             </View>
 
-            <Pressable onPress={() => router.replace('/')} style={styles.guest}>
-              <Text style={styles.guestText}>Continue as guest</Text>
+            <Pressable onPress={() => router.replace('/')} style={s.guest}>
+              <Text style={s.guestText}>Continue as guest</Text>
             </Pressable>
           </Card>
         </ScrollView>
@@ -175,48 +177,49 @@ export default function Signup() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  flex: { flex: 1 },
-  scroll: { flexGrow: 1, backgroundColor: Colors.background },
-  hero: {
-    paddingTop: 48,
-    paddingBottom: 64,
-    paddingHorizontal: 24,
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
-    alignItems: 'center',
-  },
-  logo: {
-    width: 68,
-    height: 68,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  heroTitle: { color: Colors.surface, fontSize: 26, fontWeight: '900' },
-  heroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 13, marginTop: 6, textAlign: 'center' },
-  card: {
-    marginHorizontal: 16,
-    marginTop: -36,
-  },
-  gradeWrap: { marginBottom: 14 },
-  gradeLabel: { fontSize: 13, fontWeight: '700', color: Colors.text, marginBottom: 8 },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  submit: { marginTop: 6 },
-  error: { fontSize: 12, color: Colors.danger, marginTop: 6, fontWeight: '600' },
-  switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
-  switchText: { color: Colors.textSecondary, fontSize: 13 },
-  switchLink: { color: Colors.primary, fontSize: 13, fontWeight: '800' },
-  guest: { alignItems: 'center', marginTop: 12, paddingVertical: 6 },
-  guestText: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '700',
-    textDecorationLine: 'underline',
-  },
-});
+const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    flex: { flex: 1 },
+    scroll: { flexGrow: 1, backgroundColor: C.background },
+    hero: {
+      paddingTop: 48,
+      paddingBottom: 64,
+      paddingHorizontal: 24,
+      borderBottomLeftRadius: Radius.xl,
+      borderBottomRightRadius: Radius.xl,
+      alignItems: 'center',
+    },
+    logo: {
+      width: 68,
+      height: 68,
+      borderRadius: 22,
+      backgroundColor: 'rgba(255,255,255,0.18)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.3)',
+    },
+    heroTitle: { color: C.surface, fontSize: 26, fontWeight: '900' },
+    heroSub: { color: 'rgba(255,255,255,0.82)', fontSize: 13, marginTop: 6, textAlign: 'center' },
+    card: {
+      marginHorizontal: 16,
+      marginTop: -36,
+    },
+    gradeWrap: { marginBottom: 14 },
+    gradeLabel: { fontSize: 13, fontWeight: '700', color: C.text, marginBottom: 8 },
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    submit: { marginTop: 6 },
+    error: { fontSize: 12, color: C.danger, marginTop: 6, fontWeight: '600' },
+    switchRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
+    switchText: { color: C.textSecondary, fontSize: 13 },
+    switchLink: { color: C.primary, fontSize: 13, fontWeight: '800' },
+    guest: { alignItems: 'center', marginTop: 12, paddingVertical: 6 },
+    guestText: {
+      color: C.textSecondary,
+      fontSize: 13,
+      fontWeight: '700',
+      textDecorationLine: 'underline',
+    },
+  });

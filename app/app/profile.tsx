@@ -1,11 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -13,17 +11,25 @@ import {
   View,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import {
+  ScreenHeader,
+  screenCard,
+  screenSavedBanner,
+  screenSavedText,
+  screenSectionTitle,
+} from '../components/Screen';
 import { Avatar } from '../components/ui/Avatar';
 import { BottomSheetMenu, type MenuItem } from '../components/ui/BottomSheetMenu';
 import { Button } from '../components/ui/Button';
 import { FormField } from '../components/ui/FormField';
-import { Colors, Gradients, Radius } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
+import { useColors } from '../context/ColorSchemeContext';
 
 const NAME_RE = /^[a-zA-Z\s'-]{2,40}$/;
 const PHONE_RE = /^[\d+\-()\s]{10,20}$/;
 
 export default function ProfileScreen() {
+  const { colors: C } = useColors();
   const router = useRouter();
   const { user, updateUser, logout } = useAuth();
 
@@ -37,11 +43,13 @@ export default function ProfileScreen() {
   const [saved, setSaved] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
+  const s = makeStyles(C);
+
   if (!user) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.center}>
-          <Text style={styles.centerText}>You are not signed in.</Text>
+      <SafeAreaView style={s.safe}>
+        <View style={s.center}>
+          <Text style={s.centerText}>You are not signed in.</Text>
           <Button title="Go to Login" onPress={() => router.replace('/login')} />
         </View>
       </SafeAreaView>
@@ -112,39 +120,32 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-          <LinearGradient colors={Gradients.header} style={styles.hero}>
-            <View style={styles.nav}>
-              <Pressable onPress={() => router.back()} style={styles.back}>
-                <Ionicons name="arrow-back" size={20} color={Colors.surface} />
-              </Pressable>
-              <Text style={styles.heroTitle}>My Profile</Text>
-              <View style={{ width: 38 }} />
-            </View>
+    <SafeAreaView style={s.safe}>
+      <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
+          <ScreenHeader title="My Profile" subtitle={user.email} onBack={() => router.back()} />
 
-            <View style={styles.avatarWrap}>
+          <View style={s.card}>
+            <View style={s.identity}>
               <Avatar
                 uri={avatar}
                 name={name}
-                size={96}
+                size={80}
                 onPress={() => setMenuVisible(true)}
                 editable
               />
-              <Text style={styles.email}>{user.email}</Text>
-              <Text style={styles.grade}>{user.grades.join(', ')}</Text>
+              <Text style={s.identityName} numberOfLines={1}>
+                {name || 'Your Name'}
+              </Text>
+              <Text style={s.identityGrade} numberOfLines={1}>
+                {user.grades.join(', ')}
+              </Text>
             </View>
-          </LinearGradient>
 
-          <View style={styles.card}>
             {saved ? (
-              <View style={styles.savedBanner}>
-                <Ionicons name="checkmark-circle" size={18} color={Colors.success} />
-                <Text style={styles.savedText}>Profile updated successfully</Text>
+              <View style={s.savedBanner}>
+                <Ionicons name="checkmark-circle" size={18} color={C.success} />
+                <Text style={s.savedText}>Profile updated successfully</Text>
               </View>
             ) : null}
 
@@ -178,7 +179,7 @@ export default function ProfileScreen() {
               keyboardType="phone-pad"
             />
 
-            <Text style={styles.sectionTitle}>Change Password</Text>
+            <Text style={s.sectionTitle}>Change Password</Text>
             <FormField
               label="Current Password"
               icon="lock-closed-outline"
@@ -217,7 +218,14 @@ export default function ProfileScreen() {
               title="Save Changes"
               onPress={saveProfile}
               icon="save-outline"
-              style={styles.saveBtn}
+              style={s.saveBtn}
+            />
+            <Button
+              title="Settings"
+              onPress={() => router.push('/settings')}
+              variant="soft"
+              icon="settings-outline"
+              style={s.settingsBtn}
             />
             <Button title="Log Out" onPress={logout} variant="ghost" icon="log-out-outline" />
           </View>
@@ -234,65 +242,20 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  flex: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  centerText: { fontSize: 14, color: Colors.textSecondary, marginBottom: 16 },
-  scroll: { paddingBottom: 24 },
-  hero: {
-    paddingTop: 54,
-    paddingHorizontal: 16,
-    paddingBottom: 28,
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
-    alignItems: 'center',
-  },
-  nav: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  back: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroTitle: { color: Colors.surface, fontSize: 18, fontWeight: '800' },
-  avatarWrap: { alignItems: 'center' },
-  email: { color: Colors.surface, fontSize: 15, fontWeight: '700', marginTop: 12 },
-  grade: { color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 2 },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.lg,
-    marginHorizontal: 16,
-    marginTop: -24,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: Colors.text,
-    marginTop: 8,
-    marginBottom: 6,
-  },
-  savedBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.successSoft,
-    borderRadius: Radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 14,
-  },
-  savedText: { color: Colors.success, fontWeight: '700', fontSize: 13 },
-  saveBtn: { marginTop: 6, marginBottom: 8 },
-});
+const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    flex: { flex: 1 },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+    centerText: { fontSize: 14, color: C.textSecondary, marginBottom: 16 },
+    scroll: { paddingBottom: 24 },
+    identity: { alignItems: 'center', marginBottom: 18 },
+    identityName: { fontSize: 17, fontWeight: '800', color: C.text, marginTop: 12 },
+    identityGrade: { fontSize: 13, color: C.textSecondary, marginTop: 2 },
+    card: screenCard(C),
+    sectionTitle: screenSectionTitle(C),
+    savedBanner: screenSavedBanner(C),
+    savedText: screenSavedText(C),
+    saveBtn: { marginTop: 6, marginBottom: 8 },
+    settingsBtn: { marginBottom: 8 },
+  });

@@ -1,4 +1,4 @@
-# Pora Sathi — AI Tutor (Classes 5–10 + SSC)
+# Pora Sathi — AI Tutor (Classes 8–10)
 
 Vibrant, clean, responsive Expo (React Native) dashboard UI.
 
@@ -13,22 +13,22 @@ Vibrant, clean, responsive Expo (React Native) dashboard UI.
 Feature components compose primitives from `components/ui/` — no duplicated
 button, card, chip, progress, or empty-state styles:
 
-- `components/ui/` — `Card`, `Button` (primary/soft/loading), `Chip` (selectable pill), `ProgressBar`, `EmptyState`, `SectionHeader`
+- `components/ui/` — `Card`, `Button` (primary/soft/loading), `Chip` (selectable pill), `ProgressBar`, `EmptyState`, `SectionHeader`, `FormField` (label/icon/error + password show-hide), `Avatar`, `BottomSheetMenu`, `SettingsRow`, `Skeleton`
 - `components/Header.tsx` — gradient header, streak, search, stats + continue card
 - `components/GradeTabs.tsx` — horizontal grade pills (built on `Chip`)
-- `components/SubjectGrid.tsx` — responsive 2-col subject cards + SSC crash-course banner
-- `components/Library.tsx` — PDF notes grid + quiz list (built on `Card`)
+- `components/SubjectGrid.tsx` — responsive subject cards (2-col full, 3-col `compact`)
+- `components/SscBanner.tsx` — SSC crash-course promo banner
+- `components/Library.tsx` — PDF notes grid + quiz list, plus horizontal `NotesCarousel` / `QuizCarousel`
 - `components/ProgressSection.tsx` — overall + per-subject progress (built on `Card` + `ProgressBar`)
-- `components/AuthField.tsx` — labeled input with icon, error, show/hide password
 - `components/ChatFAB.tsx` — floating AI chat button
 - `components/BottomNav.tsx` — Home / Notes / Quiz / Progress
 
 ## Data layer (demo JSON → endpoints later)
 
-- `data/*.json` — demo payloads: `grades`, `subjects`, `notes`, `quizzes`, `dashboard` (stats + continue-learning).
-- `lib/api.ts` — the only place screens get data from: `fetchGrades`, `fetchSubjects`, `fetchNotes`, `fetchQuizzes`, `fetchDashboardMeta`. Each serves local JSON with a simulated delay; every function documents the `fetch(API_BASE_URL + …)` swap. Callers already handle loading/error/retry, so endpoint migration needs no UI changes.
+- `data/*.json` — class-wise demo payloads: `grades`, `teachers`, and per-class `subjects-c{8,9,10}`, `notes-c{8,9,10}`, `quizzes-c{8,9,10}`, `dashboard-c{8,9,10}`.
+- `lib/api.ts` — the single data-access module: `fetchGrades`, `fetchSubjects`, `fetchNotes`, `fetchQuizzes`, `fetchDashboardMeta`, plus sync `getSubjectsForGrade` / `getNotesForGrade` / `getQuizzesForGrade` helpers for the subject detail screen. Results are cached in memory per grade; every function documents the `fetch(API_BASE_URL + …)` swap. Callers already handle loading/error/retry, so endpoint migration needs no UI changes.
 - `constants/data.ts` — TypeScript types only, no data.
-- Demo auth: `context/AuthContext.tsx` + `constants/demoUser.ts` (`demo@porasathi.com` / `demo1234`).
+- Demo auth: `context/AuthContext.tsx` + `constants/demoUser.ts` (`demo@porasathi.com` / `demo1234`). Sessions persist across restarts via `expo-secure-store`.
 
 ## Run
 

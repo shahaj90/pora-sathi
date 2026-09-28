@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, View, type StyleProp, type ViewStyle } from 'react-native';
 import type { ReactNode } from 'react';
-import { Colors, Radius, Shadow } from '../../constants/theme';
+import { Radius, Shadow } from '../../constants/theme';
+import { useColors } from '../../context/ColorSchemeContext';
 
 interface Props {
   children: ReactNode;
@@ -23,31 +24,26 @@ export function Card({
   onPress,
   accessibilityLabel,
 }: Props) {
-  const cardStyle = [
-    styles.base,
-    elevated && Shadow.card,
-    { padding, borderRadius: radius },
-    style,
-  ];
+  const { colors: C } = useColors();
+  const cardStyle: ViewStyle = {
+    backgroundColor: C.surface,
+    borderWidth: 1,
+    borderColor: C.border,
+    padding,
+    borderRadius: radius,
+    ...(elevated ? Shadow.card : {}),
+  };
   if (onPress) {
     return (
       <Pressable
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
-        style={({ pressed }) => [cardStyle, pressed && { opacity: 0.94 }]}
+        style={({ pressed }) => [cardStyle, pressed && { opacity: 0.94 }, style]}
       >
         {children}
       </Pressable>
     );
   }
-  return <View style={cardStyle}>{children}</View>;
+  return <View style={[cardStyle, style]}>{children}</View>;
 }
-
-const styles = StyleSheet.create({
-  base: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-});

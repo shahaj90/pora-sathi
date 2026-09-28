@@ -13,7 +13,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Gradients, Radius } from '../constants/theme';
+import { Gradients, Radius } from '../constants/theme';
+import { useColors } from '../context/ColorSchemeContext';
 
 interface Msg {
   id: string;
@@ -29,6 +30,7 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatScreen() {
+  const { colors: C } = useColors();
   const router = useRouter();
   const [msgs, setMsgs] = useState<Msg[]>([
     {
@@ -38,6 +40,8 @@ export default function ChatScreen() {
     },
   ]);
   const [input, setInput] = useState('');
+
+  const s = makeStyles(C);
 
   const send = (text?: string) => {
     const value = (text ?? input).trim();
@@ -53,61 +57,56 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <LinearGradient colors={Gradients.header} style={styles.header}>
-          <Pressable onPress={() => router.back()} style={styles.back}>
-            <Ionicons name="arrow-back" size={20} color={Colors.surface} />
+    <SafeAreaView style={s.safe}>
+      <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <LinearGradient colors={Gradients.header} style={s.header}>
+          <Pressable onPress={() => router.back()} style={s.back}>
+            <Ionicons name="arrow-back" size={20} color={C.surface} />
           </Pressable>
-          <View style={styles.botAvatar}>
-            <Ionicons name="sparkles" size={20} color={Colors.surface} />
+          <View style={s.botAvatar}>
+            <Ionicons name="sparkles" size={20} color={C.surface} />
           </View>
-          <View style={styles.flex}>
-            <Text style={styles.title}>Pora Sathi AI</Text>
-            <Text style={styles.online}>● Online · Class 10 tutor</Text>
+          <View style={s.flex}>
+            <Text style={s.title}>Pora Sathi AI</Text>
+            <Text style={s.online}>● Online · Class 10 tutor</Text>
           </View>
-          <Ionicons name="ellipsis-vertical" size={18} color={Colors.surface} />
+          <Ionicons name="ellipsis-vertical" size={18} color={C.surface} />
         </LinearGradient>
 
         <FlatList
           data={msgs}
           keyExtractor={(m) => m.id}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={s.list}
           renderItem={({ item }) => (
-            <View style={[styles.bubble, item.role === 'user' ? styles.user : styles.ai]}>
-              <Text style={[styles.msgText, item.role === 'user' && styles.userText]}>
-                {item.text}
-              </Text>
+            <View style={[s.bubble, item.role === 'user' ? s.user : s.ai]}>
+              <Text style={[s.msgText, item.role === 'user' && s.userText]}>{item.text}</Text>
             </View>
           )}
           ListHeaderComponent={
-            <View style={styles.chips}>
-              {SUGGESTIONS.map((s) => (
-                <Pressable key={s} style={styles.chip} onPress={() => send(s)}>
-                  <Text style={styles.chipText}>{s}</Text>
+            <View style={s.chips}>
+              {SUGGESTIONS.map((sg) => (
+                <Pressable key={sg} style={s.chip} onPress={() => send(sg)}>
+                  <Text style={s.chipText}>{sg}</Text>
                 </Pressable>
               ))}
             </View>
           }
         />
 
-        <View style={styles.inputRow}>
-          <Pressable style={styles.attach}>
-            <Ionicons name="add" size={22} color={Colors.primary} />
+        <View style={s.inputRow}>
+          <Pressable style={s.attach}>
+            <Ionicons name="add" size={22} color={C.primary} />
           </Pressable>
           <TextInput
             value={input}
             onChangeText={setInput}
             placeholder="Ask anything… যেকোনো প্রশ্ন করো"
-            style={styles.input}
+            style={s.input}
             multiline
             onSubmitEditing={() => send()}
           />
-          <Pressable style={styles.send} onPress={() => send()}>
-            <Ionicons name="send" size={18} color={Colors.surface} />
+          <Pressable style={s.send} onPress={() => send()}>
+            <Ionicons name="send" size={18} color={C.surface} />
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -115,85 +114,86 @@ export default function ChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.surface },
-  flex: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingTop: 54,
-    paddingHorizontal: 16,
-    paddingBottom: 14,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  back: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  botAvatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
-  },
-  title: { color: Colors.surface, fontWeight: '800', fontSize: 16 },
-  online: { color: 'rgba(255,255,255,0.85)', fontSize: 12 },
-  list: { padding: 16, gap: 10, paddingBottom: 24 },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  chip: {
-    backgroundColor: Colors.primarySoft,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-  },
-  chipText: { color: Colors.primary, fontSize: 12, fontWeight: '700' },
-  bubble: { maxWidth: '82%', padding: 12, borderRadius: Radius.md },
-  ai: { backgroundColor: Colors.bubble, alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
-  user: { backgroundColor: Colors.primary, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
-  msgText: { fontSize: 13.5, lineHeight: 19, color: Colors.text },
-  userText: { color: Colors.surface },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 8,
-    padding: 12,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    backgroundColor: Colors.surface,
-  },
-  attach: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: Colors.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    borderRadius: 22,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 14,
-    maxHeight: 100,
-  },
-  send: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: Colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.surface },
+    flex: { flex: 1 },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingTop: 54,
+      paddingHorizontal: 16,
+      paddingBottom: 14,
+      borderBottomLeftRadius: 20,
+      borderBottomRightRadius: 20,
+    },
+    back: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    botAvatar: {
+      width: 42,
+      height: 42,
+      borderRadius: 21,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.4)',
+    },
+    title: { color: C.surface, fontWeight: '800', fontSize: 16 },
+    online: { color: 'rgba(255,255,255,0.85)', fontSize: 12 },
+    list: { padding: 16, gap: 10, paddingBottom: 24 },
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
+    chip: {
+      backgroundColor: C.primarySoft,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 999,
+    },
+    chipText: { color: C.primary, fontSize: 12, fontWeight: '700' },
+    bubble: { maxWidth: '82%', padding: 12, borderRadius: Radius.md },
+    ai: { backgroundColor: C.bubble, alignSelf: 'flex-start', borderBottomLeftRadius: 4 },
+    user: { backgroundColor: C.primary, alignSelf: 'flex-end', borderBottomRightRadius: 4 },
+    msgText: { fontSize: 13.5, lineHeight: 19, color: C.text },
+    userText: { color: C.surface },
+    inputRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      gap: 8,
+      padding: 12,
+      borderTopWidth: 1,
+      borderTopColor: C.border,
+      backgroundColor: C.surface,
+    },
+    attach: {
+      width: 42,
+      height: 42,
+      borderRadius: 21,
+      backgroundColor: C.primarySoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    input: {
+      flex: 1,
+      backgroundColor: C.background,
+      borderRadius: 22,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      fontSize: 14,
+      maxHeight: 100,
+    },
+    send: {
+      width: 42,
+      height: 42,
+      borderRadius: 21,
+      backgroundColor: C.accent,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+  });

@@ -4,277 +4,250 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { GradeId, Note, Quiz, Subject } from '../../constants/data';
-import { Colors, Radius } from '../../constants/theme';
-import notesC8 from '../../data/notes-c8.json';
-import notesC9 from '../../data/notes-c9.json';
-import notesC10 from '../../data/notes-c10.json';
-import quizzesC8 from '../../data/quizzes-c8.json';
-import quizzesC9 from '../../data/quizzes-c9.json';
-import quizzesC10 from '../../data/quizzes-c10.json';
-import subjectsC8 from '../../data/subjects-c8.json';
-import subjectsC9 from '../../data/subjects-c9.json';
-import subjectsC10 from '../../data/subjects-c10.json';
-
-const SUBJECTS: Record<GradeId, Subject[]> = {
-  c8: subjectsC8 as Subject[],
-  c9: subjectsC9 as Subject[],
-  c10: subjectsC10 as Subject[],
-};
-
-const NOTES: Record<GradeId, Note[]> = {
-  c8: notesC8 as Note[],
-  c9: notesC9 as Note[],
-  c10: notesC10 as Note[],
-};
-
-const QUIZZES: Record<GradeId, Quiz[]> = {
-  c8: quizzesC8 as Quiz[],
-  c9: quizzesC9 as Quiz[],
-  c10: quizzesC10 as Quiz[],
-};
+import type { GradeId } from '../../constants/data';
+import { Radius } from '../../constants/theme';
+import { useColors } from '../../context/ColorSchemeContext';
+import { getNotesForGrade, getQuizzesForGrade, getSubjectsForGrade } from '../../lib/api';
 
 const DEFAULT_GRADE: GradeId = 'c10';
 
 export default function SubjectDetail() {
+  const { colors: C } = useColors();
   const { id, grade, tab } = useLocalSearchParams<{ id: string; grade?: string; tab?: string }>();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'notes' | 'quiz'>(tab === 'quiz' ? 'quiz' : 'notes');
 
   const gradeId = (grade as GradeId) ?? DEFAULT_GRADE;
-  const subjects = SUBJECTS[gradeId] ?? SUBJECTS[DEFAULT_GRADE];
+  const subjects = getSubjectsForGrade(gradeId);
   const subject = subjects.find((s) => s.id === id) ?? subjects[0];
 
   const notes = useMemo(() => {
-    const list = NOTES[gradeId] ?? NOTES[DEFAULT_GRADE];
-    return list.filter((n) => n.subjectId === subject.id);
+    return getNotesForGrade(gradeId).filter((n) => n.subjectId === subject.id);
   }, [gradeId, subject.id]);
 
-  const fallbackNotes = useMemo(() => NOTES[gradeId] ?? NOTES[DEFAULT_GRADE], [gradeId]);
+  const fallbackNotes = useMemo(() => getNotesForGrade(gradeId), [gradeId]);
 
   const quizzes = useMemo(() => {
-    const list = QUIZZES[gradeId] ?? QUIZZES[DEFAULT_GRADE];
-    return list.filter((q) => q.subjectId === subject.id);
+    return getQuizzesForGrade(gradeId).filter((q) => q.subjectId === subject.id);
   }, [gradeId, subject.id]);
 
-  const fallbackQuiz = useMemo(() => QUIZZES[gradeId] ?? QUIZZES[DEFAULT_GRADE], [gradeId]);
+  const fallbackQuiz = useMemo(() => getQuizzesForGrade(gradeId), [gradeId]);
+
+  const s = makeStyles(C);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={s.safe}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         <LinearGradient
           colors={subject.color}
-          style={styles.hero}
+          style={s.hero}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <View style={styles.nav}>
-            <Pressable onPress={() => router.back()} style={styles.back}>
-              <Ionicons name="arrow-back" size={20} color={Colors.surface} />
+          <View style={s.nav}>
+            <Pressable onPress={() => router.back()} style={s.back}>
+              <Ionicons name="arrow-back" size={20} color={C.surface} />
             </Pressable>
-            <Text style={styles.gradePill}>Class {gradeId.replace('c', '')}</Text>
+            <Text style={s.gradePill}>Class {gradeId.replace('c', '')}</Text>
           </View>
-          <View style={styles.iconBubble}>
-            <Ionicons name={subject.icon} size={28} color={Colors.surface} />
+          <View style={s.iconBubble}>
+            <Ionicons name={subject.icon} size={28} color={C.surface} />
           </View>
-          <Text style={styles.name}>{subject.name}</Text>
-          <Text style={styles.bangla}>
+          <Text style={s.name}>{subject.name}</Text>
+          <Text style={s.bangla}>
             {subject.bangla} · {subject.chapters} chapters
           </Text>
-          <View style={styles.statRow}>
-            <View style={styles.stat}>
-              <Text style={styles.statV}>{subject.notesCount}</Text>
-              <Text style={styles.statL}>PDF Notes</Text>
+          <View style={s.statRow}>
+            <View style={s.stat}>
+              <Text style={s.statV}>{subject.notesCount}</Text>
+              <Text style={s.statL}>PDF Notes</Text>
             </View>
-            <View style={styles.stat}>
-              <Text style={styles.statV}>{subject.quizCount}</Text>
-              <Text style={styles.statL}>Quizzes</Text>
+            <View style={s.stat}>
+              <Text style={s.statV}>{subject.quizCount}</Text>
+              <Text style={s.statL}>Quizzes</Text>
             </View>
-            <View style={styles.stat}>
-              <Text style={styles.statV}>{Math.round(subject.progress * 100)}%</Text>
-              <Text style={styles.statL}>Completed</Text>
+            <View style={s.stat}>
+              <Text style={s.statV}>{Math.round(subject.progress * 100)}%</Text>
+              <Text style={s.statL}>Completed</Text>
             </View>
           </View>
         </LinearGradient>
 
-        <View style={styles.tabRow}>
+        <View style={s.tabRow}>
           <Pressable
             onPress={() => setActiveTab('notes')}
-            style={[styles.tab, activeTab === 'notes' && styles.tabActive]}
+            style={[s.tab, activeTab === 'notes' && s.tabActive]}
           >
             <Ionicons
               name="document-text"
               size={16}
-              color={activeTab === 'notes' ? Colors.surface : Colors.textSecondary}
+              color={activeTab === 'notes' ? C.surface : C.textSecondary}
             />
-            <Text style={[styles.tabText, activeTab === 'notes' && styles.tabTextActive]}>
-              PDF Notes
-            </Text>
+            <Text style={[s.tabText, activeTab === 'notes' && s.tabTextActive]}>PDF Notes</Text>
           </Pressable>
           <Pressable
             onPress={() => setActiveTab('quiz')}
-            style={[styles.tab, activeTab === 'quiz' && styles.tabActive]}
+            style={[s.tab, activeTab === 'quiz' && s.tabActive]}
           >
             <Ionicons
               name="help-circle"
               size={16}
-              color={activeTab === 'quiz' ? Colors.surface : Colors.textSecondary}
+              color={activeTab === 'quiz' ? C.surface : C.textSecondary}
             />
-            <Text style={[styles.tabText, activeTab === 'quiz' && styles.tabTextActive]}>
-              Quizzes
-            </Text>
+            <Text style={[s.tabText, activeTab === 'quiz' && s.tabTextActive]}>Quizzes</Text>
           </Pressable>
         </View>
 
         {activeTab === 'notes' ? (
-          <View style={styles.list}>
+          <View style={s.list}>
             {(notes.length ? notes : fallbackNotes).map((n) => (
-              <View key={n.id} style={styles.card}>
-                <View style={styles.pdf}>
-                  <Text style={styles.pdfText}>PDF</Text>
+              <View key={n.id} style={s.card}>
+                <View style={s.pdf}>
+                  <Text style={s.pdfText}>PDF</Text>
                 </View>
-                <View style={styles.fill}>
-                  <Text style={styles.cardTitle}>{n.title}</Text>
-                  <Text style={styles.cardSub}>
+                <View style={s.fill}>
+                  <Text style={s.cardTitle}>{n.title}</Text>
+                  <Text style={s.cardSub}>
                     {n.chapter} · {n.pages} pages · {n.size}
                   </Text>
                 </View>
-                <Ionicons name="download-outline" size={20} color={Colors.primary} />
+                <Ionicons name="download-outline" size={20} color={C.primary} />
               </View>
             ))}
           </View>
         ) : (
-          <View style={styles.list}>
+          <View style={s.list}>
             {(quizzes.length ? quizzes : fallbackQuiz).map((q) => (
-              <View key={q.id} style={styles.card}>
-                <View style={[styles.pdf, { backgroundColor: Colors.primary }]}>
-                  <Ionicons name="play" size={16} color={Colors.surface} />
+              <View key={q.id} style={s.card}>
+                <View style={[s.pdf, { backgroundColor: C.primary }]}>
+                  <Ionicons name="play" size={16} color={C.surface} />
                 </View>
-                <View style={styles.fill}>
-                  <Text style={styles.cardTitle}>{q.title}</Text>
-                  <Text style={styles.cardSub}>
+                <View style={s.fill}>
+                  <Text style={s.cardTitle}>{q.title}</Text>
+                  <Text style={s.cardSub}>
                     {q.questions} Qs · {q.minutes} min · {q.difficulty}
                   </Text>
                 </View>
-                <Text style={styles.start}>Start</Text>
+                <Text style={s.start}>Start</Text>
               </View>
             ))}
           </View>
         )}
 
-        <Pressable style={styles.aiCta} onPress={() => router.push('/chat')}>
-          <Ionicons name="sparkles" size={20} color={Colors.surface} />
-          <Text style={styles.aiText}>Ask AI about {subject.name}</Text>
+        <Pressable style={s.aiCta} onPress={() => router.push('/chat')}>
+          <Ionicons name="sparkles" size={20} color={C.surface} />
+          <Text style={s.aiText}>Ask AI about {subject.name}</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  fill: { flex: 1 },
-  hero: {
-    paddingTop: 54,
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 26,
-    borderBottomRightRadius: 26,
-  },
-  nav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  back: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gradePill: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    color: Colors.surface,
-    fontWeight: '800',
-    fontSize: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    overflow: 'hidden',
-  },
-  iconBubble: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 16,
-  },
-  name: { color: Colors.surface, fontSize: 24, fontWeight: '900', marginTop: 10 },
-  bangla: { color: 'rgba(255,255,255,0.85)', fontSize: 13, marginTop: 2 },
-  statRow: { flexDirection: 'row', gap: 10, marginTop: 14 },
-  stat: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: Radius.md,
-    padding: 10,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  statV: { color: Colors.surface, fontWeight: '900', fontSize: 16 },
-  statL: { color: 'rgba(255,255,255,0.85)', fontSize: 11, marginTop: 2 },
-  tabRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginTop: 16 },
-  tab: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: Colors.surface,
-    paddingVertical: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  tabActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  tabText: { fontWeight: '700', color: Colors.textSecondary, fontSize: 13 },
-  tabTextActive: { color: Colors.surface },
-  list: { paddingHorizontal: 16, marginTop: 12, gap: 10 },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.md,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  pdf: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: Colors.danger,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pdfText: { color: Colors.surface, fontWeight: '900', fontSize: 12 },
-  cardTitle: { fontSize: 13.5, fontWeight: '800', color: Colors.text },
-  cardSub: { fontSize: 11.5, color: Colors.textSecondary, marginTop: 3 },
-  start: { color: Colors.accent, fontWeight: '800', fontSize: 13 },
-  aiCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: Colors.accent,
-    marginHorizontal: 16,
-    marginTop: 16,
-    paddingVertical: 14,
-    borderRadius: 999,
-  },
-  aiText: { color: Colors.surface, fontWeight: '800', fontSize: 14 },
-});
+const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    fill: { flex: 1 },
+    hero: {
+      paddingTop: 54,
+      paddingHorizontal: 16,
+      paddingBottom: 20,
+      borderBottomLeftRadius: 26,
+      borderBottomRightRadius: 26,
+    },
+    nav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    back: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: 'rgba(255,255,255,0.25)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    gradePill: {
+      backgroundColor: 'rgba(255,255,255,0.25)',
+      color: C.surface,
+      fontWeight: '800',
+      fontSize: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 999,
+      overflow: 'hidden',
+    },
+    iconBubble: {
+      width: 56,
+      height: 56,
+      borderRadius: 18,
+      backgroundColor: 'rgba(255,255,255,0.25)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 16,
+    },
+    name: { color: C.surface, fontSize: 24, fontWeight: '900', marginTop: 10 },
+    bangla: { color: 'rgba(255,255,255,0.85)', fontSize: 13, marginTop: 2 },
+    statRow: { flexDirection: 'row', gap: 10, marginTop: 14 },
+    stat: {
+      flex: 1,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      borderRadius: Radius.md,
+      padding: 10,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.3)',
+    },
+    statV: { color: C.surface, fontWeight: '900', fontSize: 16 },
+    statL: { color: 'rgba(255,255,255,0.85)', fontSize: 11, marginTop: 2 },
+    tabRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, marginTop: 16 },
+    tab: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      backgroundColor: C.surface,
+      paddingVertical: 12,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    tabActive: { backgroundColor: C.primary, borderColor: C.primary },
+    tabText: { fontWeight: '700', color: C.textSecondary, fontSize: 13 },
+    tabTextActive: { color: C.surface },
+    list: { paddingHorizontal: 16, marginTop: 12, gap: 10 },
+    card: {
+      backgroundColor: C.surface,
+      borderRadius: Radius.md,
+      padding: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    pdf: {
+      width: 44,
+      height: 44,
+      borderRadius: 12,
+      backgroundColor: C.danger,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    pdfText: { color: C.surface, fontWeight: '900', fontSize: 12 },
+    cardTitle: { fontSize: 13.5, fontWeight: '800', color: C.text },
+    cardSub: { fontSize: 11.5, color: C.textSecondary, marginTop: 3 },
+    start: { color: C.accent, fontWeight: '800', fontSize: 13 },
+    aiCta: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: C.accent,
+      marginHorizontal: 16,
+      marginTop: 16,
+      paddingVertical: 14,
+      borderRadius: 999,
+    },
+    aiText: { color: C.surface, fontWeight: '800', fontSize: 14 },
+  });

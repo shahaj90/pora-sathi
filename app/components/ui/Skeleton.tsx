@@ -7,7 +7,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useEffect } from 'react';
-import { Colors, Radius } from '../../constants/theme';
+import { Radius } from '../../constants/theme';
+import { useColors } from '../../context/ColorSchemeContext';
 
 interface Props {
   width?: number | `${number}%`;
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export function Skeleton({ width = '100%', height = 18, borderRadius = Radius.sm, style }: Props) {
+  const { colors: C } = useColors();
   const shimmer = useSharedValue(-1);
 
   useEffect(() => {
@@ -30,13 +32,13 @@ export function Skeleton({ width = '100%', height = 18, borderRadius = Radius.sm
   return (
     <View
       style={[
-        { width, height, borderRadius, overflow: 'hidden', backgroundColor: Colors.border },
+        { width, height, borderRadius, overflow: 'hidden', backgroundColor: C.border },
         style,
       ]}
     >
       <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
         <LinearGradient
-          colors={['transparent', 'rgba(255,255,255,0.5)', 'transparent']}
+          colors={['transparent', 'rgba(255,255,255,0.18)', 'transparent']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={StyleSheet.absoluteFill}

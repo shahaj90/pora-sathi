@@ -1,5 +1,5 @@
-import { StyleSheet, View } from 'react-native';
-import { Colors } from '../../constants/theme';
+import { View } from 'react-native';
+import { useColors } from '../../context/ColorSchemeContext';
 
 interface Props {
   value: number; // 0-1
@@ -9,26 +9,27 @@ interface Props {
 }
 
 /** Shared progress bar. */
-export function ProgressBar({ value, color = Colors.primary, trackColor, height = 6 }: Props) {
+export function ProgressBar({ value, color, trackColor, height = 6 }: Props) {
+  const { colors: C } = useColors();
+  const fillColor = color ?? C.accent;
   const pct = Math.max(0, Math.min(1, value));
   return (
     <View
-      style={[
-        styles.track,
-        { height, borderRadius: height / 2, backgroundColor: trackColor ?? `${color}26` },
-      ]}
+      style={{
+        height,
+        borderRadius: height / 2,
+        backgroundColor: trackColor ?? C.surfaceAlt,
+        overflow: 'hidden',
+      }}
     >
       <View
-        style={[
-          styles.fill,
-          { width: `${Math.round(pct * 100)}%`, backgroundColor: color, borderRadius: height / 2 },
-        ]}
+        style={{
+          width: `${Math.round(pct * 100)}%`,
+          backgroundColor: fillColor,
+          borderRadius: height / 2,
+          height: '100%',
+        }}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  track: { overflow: 'hidden' },
-  fill: { height: '100%' },
-});

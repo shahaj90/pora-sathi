@@ -1,14 +1,7 @@
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { Modal, Pressable, ScrollView, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Radius, Shadow } from '../../constants/theme';
+import { Radius, Shadow } from '../../constants/theme';
+import { useColors } from '../../context/ColorSchemeContext';
 
 export interface MenuItem {
   id: string;
@@ -25,93 +18,96 @@ interface Props {
 }
 
 export function BottomSheetMenu({ visible, title, items, onClose }: Props) {
+  const { colors: C } = useColors();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.backdrop} />
+        <View style={{ flex: 1, backgroundColor: 'rgba(15,18,33,0.45)' }} />
       </TouchableWithoutFeedback>
-      <View style={styles.sheet}>
-        <View style={styles.handle} />
-        <Text style={styles.title}>{title}</Text>
+      <View
+        style={{
+          backgroundColor: C.surface,
+          borderTopLeftRadius: Radius.xl,
+          borderTopRightRadius: Radius.xl,
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          paddingBottom: 32,
+          ...Shadow.card,
+        }}
+      >
+        <View
+          style={{
+            width: 40,
+            height: 5,
+            borderRadius: 3,
+            backgroundColor: C.border,
+            alignSelf: 'center',
+            marginBottom: 12,
+          }}
+        />
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: '800',
+            color: C.text,
+            textAlign: 'center',
+            marginBottom: 16,
+          }}
+        >
+          {title}
+        </Text>
         <ScrollView>
           {items.map((item) => (
             <Pressable
               key={item.id}
-              style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+              style={({ pressed }) => [
+                {
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 12,
+                  paddingVertical: 14,
+                  borderBottomWidth: 1,
+                  borderBottomColor: C.border,
+                },
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => {
                 item.onPress();
                 onClose();
               }}
             >
-              <View style={styles.iconWrap}>
-                <Ionicons name={item.icon} size={20} color={Colors.primary} />
+              <View
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 10,
+                  backgroundColor: C.primarySoft,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Ionicons name={item.icon} size={20} color={C.primary} />
               </View>
-              <Text style={styles.label}>{item.label}</Text>
-              <Ionicons name="chevron-forward" size={18} color={Colors.muted} />
+              <Text style={{ flex: 1, fontSize: 15, fontWeight: '700', color: C.text }}>
+                {item.label}
+              </Text>
+              <Ionicons name="chevron-forward" size={18} color={C.muted} />
             </Pressable>
           ))}
         </ScrollView>
-        <Pressable style={styles.cancelBtn} onPress={onClose}>
-          <Text style={styles.cancelText}>Cancel</Text>
+        <Pressable
+          onPress={onClose}
+          style={{
+            marginTop: 12,
+            backgroundColor: C.background,
+            paddingVertical: 14,
+            borderRadius: Radius.pill,
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ fontSize: 15, fontWeight: '800', color: C.textSecondary }}>Cancel</Text>
         </Pressable>
       </View>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(15,18,33,0.45)',
-  },
-  sheet: {
-    backgroundColor: Colors.surface,
-    borderTopLeftRadius: Radius.xl,
-    borderTopRightRadius: Radius.xl,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 32,
-    ...Shadow.card,
-  },
-  handle: {
-    width: 40,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: Colors.border,
-    alignSelf: 'center',
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: Colors.text,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  itemPressed: { opacity: 0.7 },
-  iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: Colors.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  label: { flex: 1, fontSize: 15, fontWeight: '700', color: Colors.text },
-  cancelBtn: {
-    marginTop: 12,
-    backgroundColor: Colors.background,
-    paddingVertical: 14,
-    borderRadius: Radius.pill,
-    alignItems: 'center',
-  },
-  cancelText: { fontSize: 15, fontWeight: '800', color: Colors.textSecondary },
-});

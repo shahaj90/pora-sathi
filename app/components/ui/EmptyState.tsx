@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../constants/theme';
+import { Text, View } from 'react-native';
+import { useColors } from '../../context/ColorSchemeContext';
 import { Button } from './Button';
 
 interface Props {
@@ -19,31 +19,33 @@ export function EmptyState({
   actionTitle,
   onAction,
 }: Props) {
+  const { colors: C } = useColors();
   return (
-    <View style={styles.wrap}>
-      <View style={styles.icon}>
-        <Ionicons name={icon} size={30} color={Colors.primary} />
+    <View style={{ alignItems: 'center', paddingHorizontal: 32, paddingVertical: 24, gap: 6 }}>
+      <View
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 32,
+          backgroundColor: C.primarySoft,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 6,
+        }}
+      >
+        <Ionicons name={icon} size={30} color={C.primary} />
       </View>
-      <Text style={styles.title}>{title}</Text>
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <Text style={{ fontSize: 16, fontWeight: '800', color: C.text, textAlign: 'center' }}>
+        {title}
+      </Text>
+      {subtitle ? (
+        <Text style={{ fontSize: 13, color: C.muted, textAlign: 'center', lineHeight: 19 }}>
+          {subtitle}
+        </Text>
+      ) : null}
       {actionTitle && onAction ? (
         <Button title={actionTitle} onPress={onAction} icon="refresh" />
       ) : null}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrap: { alignItems: 'center', paddingHorizontal: 32, paddingVertical: 24, gap: 6 },
-  icon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: Colors.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  title: { fontSize: 16, fontWeight: '800', color: Colors.text, textAlign: 'center' },
-  subtitle: { fontSize: 13, color: Colors.muted, textAlign: 'center', lineHeight: 19 },
-});

@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -12,18 +11,37 @@ import {
   Text,
   View,
 } from 'react-native';
+import {
+  ScreenHeader,
+  screenCard,
+  screenSavedBanner,
+  screenSavedText,
+  screenSectionTitle,
+} from '../components/Screen';
 import { Chip } from '../components/ui/Chip';
 import { SettingsRow } from '../components/ui/SettingsRow';
 import { type Grade, type GradeId, type Teacher } from '../constants/data';
-import { Colors, Gradients, Radius } from '../constants/theme';
+import { Radius } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
+import { useColors, type ThemePreference } from '../context/ColorSchemeContext';
 import gradesJson from '../data/grades.json';
 import teachersJson from '../data/teachers.json';
 
 const GRADES = gradesJson as Grade[];
 const TEACHERS = teachersJson as Teacher[];
 
+const THEME_OPTIONS: {
+  value: ThemePreference;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  { value: 'system', label: 'System', icon: 'phone-portrait-outline' },
+  { value: 'light', label: 'Light', icon: 'sunny-outline' },
+  { value: 'dark', label: 'Dark', icon: 'moon-outline' },
+];
+
 export default function SettingsScreen() {
+  const { colors: C, scheme, preference, setPreference } = useColors();
   const router = useRouter();
   const { user, updateUser, logout } = useAuth();
 
@@ -36,16 +54,19 @@ export default function SettingsScreen() {
     TEACHERS.find((t) => t.name === user?.teacher)?.id ?? null,
   );
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const systemLabel = scheme === 'dark' ? 'currently dark' : 'currently light';
+
+  const s = makeStyles(C);
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.center}>
-          <Text style={styles.centerText}>You are not signed in.</Text>
-          <Pressable style={styles.loginBtn} onPress={() => router.replace('/login')}>
-            <Text style={styles.loginText}>Go to Login</Text>
+      <SafeAreaView style={s.safe}>
+        <View style={s.center}>
+          <Text style={s.centerText}>You are not signed in.</Text>
+          <Pressable style={s.loginBtn} onPress={() => router.replace('/login')}>
+            <Text style={s.loginText}>Go to Login</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -65,32 +86,21 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-          <LinearGradient colors={Gradients.header} style={styles.hero}>
-            <View style={styles.nav}>
-              <Pressable onPress={() => router.back()} style={styles.back}>
-                <Ionicons name="arrow-back" size={20} color={Colors.surface} />
-              </Pressable>
-              <Text style={styles.heroTitle}>Settings</Text>
-              <View style={{ width: 38 }} />
-            </View>
-          </LinearGradient>
+    <SafeAreaView style={s.safe}>
+      <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
+          <ScreenHeader title="Settings" onBack={() => router.back()} />
 
-          <View style={styles.card}>
+          <View style={s.card}>
             {saved ? (
-              <View style={styles.savedBanner}>
-                <Ionicons name="checkmark-circle" size={18} color={Colors.success} />
-                <Text style={styles.savedText}>Settings saved successfully</Text>
+              <View style={s.savedBanner}>
+                <Ionicons name="checkmark-circle" size={18} color={C.success} />
+                <Text style={s.savedText}>Settings saved successfully</Text>
               </View>
             ) : null}
 
-            <Text style={styles.sectionTitle}>Your Classes</Text>
-            <View style={styles.chips}>
+            <Text style={s.sectionTitle}>Your Classes</Text>
+            <View style={s.chips}>
               {GRADES.map((g) => (
                 <Chip
                   key={g.id}
@@ -101,53 +111,84 @@ export default function SettingsScreen() {
               ))}
             </View>
 
-            <Text style={styles.sectionTitle}>Preferred Teacher</Text>
-            <View style={styles.teachers}>
+            <Text style={s.sectionTitle}>Preferred Teacher</Text>
+            <View style={s.teachers}>
               {TEACHERS.map((t) => {
                 const selected = teacherId === t.id;
                 return (
                   <Pressable
                     key={t.id}
                     onPress={() => setTeacherId(t.id)}
-                    style={[styles.teacherCard, selected && styles.teacherCardActive]}
+                    style={[s.teacherCard, selected && s.teacherCardActive]}
                   >
-                    <View
-                      style={[styles.teacherIcon, selected && { backgroundColor: Colors.primary }]}
-                    >
-                      <Ionicons
-                        name="person"
-                        size={18}
-                        color={selected ? Colors.surface : Colors.primary}
-                      />
+                    <View style={[s.teacherIcon, selected && { backgroundColor: C.primary }]}>
+                      <Ionicons name="person" size={18} color={selected ? C.surface : C.primary} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={[styles.teacherName, selected && styles.teacherNameActive]}>
-                        {t.name}
-                      </Text>
-                      <Text style={styles.teacherSub}>{t.subject}</Text>
+                      <Text style={[s.teacherName, selected && s.teacherNameActive]}>{t.name}</Text>
+                      <Text style={s.teacherSub}>{t.subject}</Text>
                     </View>
                     {selected ? (
-                      <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
+                      <Ionicons name="checkmark-circle" size={20} color={C.primary} />
                     ) : null}
                   </Pressable>
                 );
               })}
             </View>
 
-            <Text style={styles.sectionTitle}>System</Text>
-            <View style={styles.rows}>
+            <Text style={s.sectionTitle}>System</Text>
+            <View style={s.rows}>
               <SettingsRow
                 icon="notifications-outline"
                 label="Push Notifications"
                 value={notifications}
                 onToggle={setNotifications}
               />
-              <SettingsRow
-                icon="moon-outline"
-                label="Dark Mode"
-                value={darkMode}
-                onToggle={setDarkMode}
-              />
+              <View style={s.themeBlock}>
+                <View style={s.themeHeader}>
+                  <Ionicons name="contrast-outline" size={18} color={C.primary} />
+                  <Text style={s.themeTitle}>Appearance</Text>
+                  <Text style={s.themeValue}>
+                    {preference === 'system' ? 'System' : preference === 'dark' ? 'Dark' : 'Light'}
+                  </Text>
+                </View>
+                <View style={s.themeOptions}>
+                  {THEME_OPTIONS.map((opt) => {
+                    const active = preference === opt.value;
+                    return (
+                      <Pressable
+                        key={opt.value}
+                        onPress={() => setPreference(opt.value)}
+                        accessibilityRole="radio"
+                        accessibilityState={{ selected: active }}
+                        style={[
+                          s.themeOption,
+                          active && { backgroundColor: C.primary, borderColor: C.primary },
+                        ]}
+                      >
+                        <Ionicons
+                          name={opt.icon}
+                          size={16}
+                          color={active ? C.surface : C.textSecondary}
+                        />
+                        <Text
+                          style={[
+                            s.themeOptionText,
+                            { color: active ? C.surface : C.textSecondary },
+                          ]}
+                        >
+                          {opt.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+                {preference === 'system' ? (
+                  <Text style={s.themeHint}>
+                    Following your device setting{systemLabel ? ` (${systemLabel})` : ''}.
+                  </Text>
+                ) : null}
+              </View>
               <SettingsRow
                 icon="language-outline"
                 label="Language"
@@ -164,11 +205,11 @@ export default function SettingsScreen() {
               />
             </View>
 
-            <Pressable style={styles.saveBtn} onPress={saveSettings}>
-              <Text style={styles.saveText}>Save Settings</Text>
+            <Pressable style={s.saveBtn} onPress={saveSettings}>
+              <Text style={s.saveText}>Save Settings</Text>
             </Pressable>
-            <Pressable style={styles.logoutBtn} onPress={logout}>
-              <Text style={styles.logoutText}>Log Out</Text>
+            <Pressable style={s.logoutBtn} onPress={logout}>
+              <Text style={s.logoutText}>Log Out</Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -177,101 +218,83 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  flex: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  centerText: { fontSize: 14, color: Colors.textSecondary, marginBottom: 16 },
-  loginBtn: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 999,
-  },
-  loginText: { color: Colors.surface, fontWeight: '800', fontSize: 14 },
-  scroll: { paddingBottom: 24 },
-  hero: {
-    paddingTop: 54,
-    paddingHorizontal: 16,
-    paddingBottom: 24,
-    borderBottomLeftRadius: Radius.xl,
-    borderBottomRightRadius: Radius.xl,
-  },
-  nav: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  back: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroTitle: { color: Colors.surface, fontSize: 18, fontWeight: '800' },
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.lg,
-    marginHorizontal: 16,
-    marginTop: -24,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: Colors.text,
-    marginTop: 8,
-    marginBottom: 10,
-  },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
-  teachers: { gap: 8, marginBottom: 8 },
-  teacherCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: Colors.background,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Radius.md,
-    padding: 12,
-  },
-  teacherCardActive: { borderColor: Colors.primary, backgroundColor: Colors.primarySoft },
-  teacherIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: Colors.primarySoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  teacherName: { fontSize: 14, fontWeight: '800', color: Colors.text },
-  teacherNameActive: { color: Colors.primary },
-  teacherSub: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-  rows: { gap: 8, marginBottom: 16 },
-  savedBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: Colors.successSoft,
-    borderRadius: Radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 14,
-  },
-  savedText: { color: Colors.success, fontWeight: '700', fontSize: 13 },
-  saveBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: 999,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  saveText: { color: Colors.surface, fontWeight: '800', fontSize: 15 },
-  logoutBtn: { borderRadius: 999, paddingVertical: 14, alignItems: 'center' },
-  logoutText: { color: Colors.danger, fontWeight: '800', fontSize: 15 },
-});
+const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    flex: { flex: 1 },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+    centerText: { fontSize: 14, color: C.textSecondary, marginBottom: 16 },
+    loginBtn: {
+      backgroundColor: C.primary,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 999,
+    },
+    loginText: { color: C.surface, fontWeight: '800', fontSize: 14 },
+    scroll: { paddingBottom: 24 },
+    themeBlock: {
+      backgroundColor: C.background,
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: Radius.md,
+      padding: 12,
+      gap: 10,
+    },
+    themeHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    themeTitle: { flex: 1, fontSize: 14, fontWeight: '800', color: C.text },
+    themeValue: { fontSize: 12, fontWeight: '700', color: C.textSecondary },
+    themeOptions: { flexDirection: 'row', gap: 8 },
+    themeOption: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      paddingVertical: 10,
+      borderRadius: Radius.sm,
+      borderWidth: 1,
+      borderColor: C.border,
+      backgroundColor: C.surface,
+    },
+    themeOptionText: { fontSize: 12, fontWeight: '700' },
+    themeHint: { fontSize: 11, color: C.muted },
+    card: screenCard(C),
+    sectionTitle: screenSectionTitle(C),
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
+    teachers: { gap: 8, marginBottom: 8 },
+    teacherCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      backgroundColor: C.background,
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: Radius.md,
+      padding: 12,
+    },
+    teacherCardActive: { borderColor: C.primary, backgroundColor: C.primarySoft },
+    teacherIcon: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: C.primarySoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    teacherName: { fontSize: 14, fontWeight: '800', color: C.text },
+    teacherNameActive: { color: C.primary },
+    teacherSub: { fontSize: 12, color: C.textSecondary, marginTop: 2 },
+    rows: { gap: 8, marginBottom: 16 },
+    savedBanner: screenSavedBanner(C),
+    savedText: screenSavedText(C),
+    saveBtn: {
+      backgroundColor: C.primary,
+      borderRadius: 999,
+      paddingVertical: 14,
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+    saveText: { color: C.surface, fontWeight: '800', fontSize: 15 },
+    logoutBtn: { borderRadius: 999, paddingVertical: 14, alignItems: 'center' },
+    logoutText: { color: C.danger, fontWeight: '800', fontSize: 15 },
+  });

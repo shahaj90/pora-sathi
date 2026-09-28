@@ -42,10 +42,25 @@ const MOCK_DELAY_MS = 400;
 
 const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-export async function fetchGrades(): Promise<Grade[]> {
-  await delay(MOCK_DELAY_MS);
-  return gradesJson as Grade[];
+// ---------------------------------------------------------------------------
+// In-memory cache by grade — avoids re-awaiting JSON imports when switching
+// grades. Once the backend lands, replace with TanStack Query / React Query.
+// ---------------------------------------------------------------------------
+
+type CacheEntry<T> = { data: T };
+const cache = new Map<string, CacheEntry<unknown>>();
+
+function cached<T>(key: string, fallback: () => T): T {
+  const hit = cache.get(key);
+  if (hit) return hit.data as T;
+  const data = fallback();
+  cache.set(key, { data });
+  return data;
 }
+
+// ---------------------------------------------------------------------------
+// Raw data maps
+// ---------------------------------------------------------------------------
 
 const SUBJECTS: Record<GradeId, Subject[]> = {
   c8: subjectsC8 as Subject[],
@@ -71,19 +86,28 @@ const DASHBOARD: Record<GradeId, DashboardMeta> = {
   c10: dashboardC10 as DashboardMeta,
 };
 
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
+
+export async function fetchGrades(): Promise<Grade[]> {
+  await delay(MOCK_DELAY_MS);
+  return gradesJson as Grade[];
+}
+
 export async function fetchSubjects(gradeId: GradeId): Promise<Subject[]> {
   await delay(MOCK_DELAY_MS);
-  return SUBJECTS[gradeId] ?? [];
+  return cached(`subjects:${gradeId}`, () => SUBJECTS[gradeId] ?? []);
 }
 
 export async function fetchNotes(gradeId: GradeId): Promise<Note[]> {
   await delay(MOCK_DELAY_MS);
-  return NOTES[gradeId] ?? [];
+  return cached(`notes:${gradeId}`, () => NOTES[gradeId] ?? []);
 }
 
 export async function fetchQuizzes(gradeId: GradeId): Promise<Quiz[]> {
   await delay(MOCK_DELAY_MS);
-  return QUIZZES[gradeId] ?? [];
+  return cached(`quizzes:${gradeId}`, () => QUIZZES[gradeId] ?? []);
 }
 
 export interface DashboardMeta {
@@ -94,5 +118,26 @@ export interface DashboardMeta {
 
 export async function fetchDashboardMeta(gradeId: GradeId): Promise<DashboardMeta> {
   await delay(MOCK_DELAY_MS);
-  return DASHBOARD[gradeId] ?? (dashboardC10 as DashboardMeta);
+  return cached(
+    `dashboard:${gradeId}`,
+    () => DASHBOARD[gradeId] ?? (dashboardC10 as DashboardMeta),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Helpers for screens that import JSON directly (subject/[id].tsx)
+// Once that screen switches to this module, re-export the lookup maps so
+// there's a single source of truth.
+// ---------------------------------------------------------------------------
+
+export function getSubjectsForGrade(gradeId: GradeId): Subject[] {
+  return SUBJECTS[gradeId] ?? [];
+}
+
+export function getNotesForGrade(gradeId: GradeId): Note[] {
+  return NOTES[gradeId] ?? [];
+}
+
+export function getQuizzesForGrade(gradeId: GradeId): Quiz[] {
+  return QUIZZES[gradeId] ?? [];
 }
