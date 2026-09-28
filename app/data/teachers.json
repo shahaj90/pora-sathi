@@ -1,0 +1,7 @@
+[
+  { "id": "kamal", "name": "Kamal Sir", "subject": "Mathematics" },
+  { "id": "rahim", "name": "Rahim Sir", "subject": "Physics" },
+  { "id": "fatema", "name": "Fatema Ma'am", "subject": "Chemistry" },
+  { "id": "nasrin", "name": "Nasrin Ma'am", "subject": "Biology" },
+  { "id": "sadia", "name": "Sadia Ma'am", "subject": "English" }
+]

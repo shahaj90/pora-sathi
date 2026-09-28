@@ -4,6 +4,7 @@ import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNav, type BottomTabId } from '../components/BottomNav';
 import { ChatFAB } from '../components/ChatFAB';
+import { BottomSheetMenu, type MenuItem } from '../components/ui/BottomSheetMenu';
 import { ContentSkeleton, DashboardSkeleton } from '../components/DashboardSkeleton';
 import { GradeTabs } from '../components/GradeTabs';
 import { ContinueCard, HomeHeader } from '../components/Header';
@@ -127,6 +128,23 @@ export default function Dashboard() {
     router.replace('/login');
   };
 
+  const [menuVisible, setMenuVisible] = useState(false);
+  const menuItems: MenuItem[] = [
+    {
+      id: 'profile',
+      label: 'My Profile',
+      icon: 'person-outline',
+      onPress: () => router.push('/profile'),
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      icon: 'settings-outline',
+      onPress: () => router.push('/settings'),
+    },
+    { id: 'logout', label: 'Log Out', icon: 'log-out-outline', onPress: handleLogout },
+  ];
+
   if (loading) {
     return <DashboardSkeleton />;
   }
@@ -155,12 +173,13 @@ export default function Dashboard() {
           <HomeHeader
             name={user?.name ?? 'Guest'}
             grades={user?.grades ?? ['Class 10']}
+            avatar={user?.avatar}
             stats={stats}
             query={query}
             onQueryChange={setQuery}
             onMic={openChat}
             onStreak={() => setView('progress')}
-            onLogout={handleLogout}
+            onProfile={() => setMenuVisible(true)}
           />
           <View style={styles.gradeWrap}>
             <GradeTabs grades={grades} active={grade} onChange={changeGrade} />
@@ -278,6 +297,13 @@ export default function Dashboard() {
         <ChatFAB onPress={openChat} />
         <BottomNav active={view} onChange={setView} />
       </View>
+
+      <BottomSheetMenu
+        visible={menuVisible}
+        title="Menu"
+        items={menuItems}
+        onClose={() => setMenuVisible(false)}
+      />
     </SafeAreaView>
   );
 }

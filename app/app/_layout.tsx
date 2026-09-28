@@ -18,6 +18,8 @@ export default function RootLayout() {
         <Stack.Screen name="signup" />
         <Stack.Screen name="chat" options={{ presentation: 'modal' }} />
         <Stack.Screen name="subject/[id]" />
+        <Stack.Screen name="profile" />
+        <Stack.Screen name="settings" />
       </Stack>
     </AuthProvider>
   );

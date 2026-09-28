@@ -63,3 +63,9 @@ export interface SscBanner {
   subtitle: string;
   action: string;
 }
+
+export interface Teacher {
+  id: string;
+  name: string;
+  subject: string;
+}

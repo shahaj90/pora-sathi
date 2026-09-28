@@ -9,6 +9,9 @@ export interface SessionUser {
   name: string;
   email: string;
   grades: string[];
+  avatar?: string;
+  phone?: string;
+  teacher?: string;
 }
 
 interface AuthContextValue {
@@ -16,6 +19,7 @@ interface AuthContextValue {
   /** Returns error message on failure, null on success. */
   login: (email: string, password: string) => string | null;
   register: (email: string, gradeIds: GradeId[]) => void;
+  updateUser: (updates: Partial<SessionUser>) => void;
   logout: () => void;
 }
 
@@ -27,7 +31,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback((email: string, password: string) => {
     // Demo check — swap for POST /api/auth/login once the backend lands.
     if (email.trim().toLowerCase() === DEMO_USER.email && password === DEMO_USER.password) {
-      setUser({ name: DEMO_USER.name, email: DEMO_USER.email, grades: DEMO_USER.grades });
+      setUser({
+        name: DEMO_USER.name,
+        email: DEMO_USER.email,
+        grades: DEMO_USER.grades,
+        avatar: DEMO_USER.avatar,
+        phone: DEMO_USER.phone,
+        teacher: DEMO_USER.teacher,
+      });
       return null;
     }
     return 'Invalid email or password. Try the demo account below.';
@@ -48,9 +59,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const updateUser = useCallback((updates: Partial<SessionUser>) => {
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+  }, []);
+
   const logout = useCallback(() => setUser(null), []);
 
-  const value = useMemo(() => ({ user, login, register, logout }), [user, login, register, logout]);
+  const value = useMemo(
+    () => ({ user, login, register, updateUser, logout }),
+    [user, login, register, updateUser, logout],
+  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

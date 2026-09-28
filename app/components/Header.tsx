@@ -4,25 +4,28 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { ContinueLearning, DashboardStats } from '../constants/data';
 import { Colors, Gradients, Radius, Shadow } from '../constants/theme';
 import { ProgressBar } from './ui/ProgressBar';
+import { Avatar } from './ui/Avatar';
 
 export function HomeHeader({
   name,
   grades,
+  avatar,
   stats,
   query,
   onQueryChange,
   onMic,
   onStreak,
-  onLogout,
+  onProfile,
 }: {
   name: string;
   grades: string[];
+  avatar?: string;
   stats: DashboardStats;
   query: string;
   onQueryChange: (q: string) => void;
   onMic: () => void;
   onStreak: () => void;
-  onLogout: () => void;
+  onProfile: () => void;
 }) {
   const gradeLabel =
     grades.length <= 1 ? (grades[0] ?? 'Class 10') : `${grades[0]} +${grades.length - 1}`;
@@ -35,10 +38,14 @@ export function HomeHeader({
     >
       <View style={styles.topRow}>
         <View style={styles.profileRow}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{name.charAt(0).toUpperCase()}</Text>
-          </View>
-          <View>
+          <Pressable
+            onPress={onProfile}
+            accessibilityRole="button"
+            accessibilityLabel="Open profile menu"
+          >
+            <Avatar uri={avatar} name={name} size={44} />
+          </Pressable>
+          <View style={styles.nameCol}>
             <Text style={styles.hello}>Assalamu Alaikum 👋</Text>
             <Text style={styles.name}>
               {name} · {gradeLabel}
@@ -54,14 +61,6 @@ export function HomeHeader({
           >
             <Ionicons name="flame" size={18} color={Colors.accent} />
             <Text style={styles.streak}>{stats.streak}</Text>
-          </Pressable>
-          <Pressable
-            style={styles.iconBtn}
-            onPress={onLogout}
-            accessibilityLabel="Log out"
-            accessibilityRole="button"
-          >
-            <Ionicons name="log-out-outline" size={18} color={Colors.primary} />
           </Pressable>
         </View>
       </View>
@@ -140,7 +139,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: Radius.xl,
   },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  profileRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  profileRow: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  nameCol: { justifyContent: 'center' },
   avatar: {
     width: 44,
     height: 44,
