@@ -1,6 +1,6 @@
 [
   {
-    "id": "q1",
+    "id": "q10-1",
     "subjectId": "mathematics",
     "title": "Algebra Sprint",
     "questions": 15,
@@ -10,7 +10,7 @@
     "bestScore": 80
   },
   {
-    "id": "q2",
+    "id": "q10-2",
     "subjectId": "physics",
     "title": "Newton Laws Challenge",
     "questions": 12,
@@ -20,7 +20,7 @@
     "bestScore": 67
   },
   {
-    "id": "q3",
+    "id": "q10-3",
     "subjectId": "chemistry",
     "title": "Periodic Table Blitz",
     "questions": 10,
@@ -30,7 +30,7 @@
     "bestScore": 90
   },
   {
-    "id": "q4",
+    "id": "q10-4",
     "subjectId": "english",
     "title": "Vocabulary Master — SSC",
     "questions": 20,

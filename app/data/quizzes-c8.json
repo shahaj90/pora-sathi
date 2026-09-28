@@ -1,0 +1,70 @@
+[
+  {
+    "id": "q8-1",
+    "subjectId": "mathematics",
+    "title": "Ratio & Proportion Sprint",
+    "questions": 12,
+    "minutes": 15,
+    "difficulty": "Easy",
+    "attempts": "2.4k",
+    "bestScore": 85
+  },
+  {
+    "id": "q8-2",
+    "subjectId": "science",
+    "title": "Force & Motion Challenge",
+    "questions": 10,
+    "minutes": 12,
+    "difficulty": "Medium",
+    "attempts": "1.8k",
+    "bestScore": 72
+  },
+  {
+    "id": "q8-3",
+    "subjectId": "science",
+    "title": "States of Matter Blitz",
+    "questions": 8,
+    "minutes": 10,
+    "difficulty": "Easy",
+    "attempts": "1.5k",
+    "bestScore": 88
+  },
+  {
+    "id": "q8-4",
+    "subjectId": "bangla1",
+    "title": "বাংলা পদ্য কুইজ",
+    "questions": 12,
+    "minutes": 12,
+    "difficulty": "Medium",
+    "attempts": "2.1k",
+    "bestScore": 80
+  },
+  {
+    "id": "q8-5",
+    "subjectId": "bangla2",
+    "title": "ব্যাকরণ মাস্টার ক্লাস ৮",
+    "questions": 10,
+    "minutes": 10,
+    "difficulty": "Easy",
+    "attempts": "1.9k",
+    "bestScore": 86
+  },
+  {
+    "id": "q8-6",
+    "subjectId": "english1",
+    "title": "Reading Comprehension Quiz",
+    "questions": 12,
+    "minutes": 12,
+    "difficulty": "Medium",
+    "attempts": "2.3k"
+  },
+  {
+    "id": "q8-7",
+    "subjectId": "english2",
+    "title": "Parts of Speech Quiz",
+    "questions": 14,
+    "minutes": 12,
+    "difficulty": "Medium",
+    "attempts": "3.2k"
+  }
+]

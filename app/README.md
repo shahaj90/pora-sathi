@@ -4,7 +4,7 @@ Vibrant, clean, responsive Expo (React Native) dashboard UI.
 
 ## Screens (in `app/`)
 
-- `app/index.tsx` — Dashboard: greeting header + search, grade tabs (Class 5–10, SSC), continue-learning, subject grid (Math, Physics, Chemistry, Biology, English), PDF notes, quizzes, floating AI chat button, bottom nav.
+- `app/index.tsx` — Dashboard: greeting header + search, grade tabs (Class 8–10), continue-learning, subject grid (Math, Science/Physics/Chemistry/Biology, Bangla 1st/2nd Paper, English 1st/2nd Paper), PDF notes, quizzes, floating AI chat button, bottom nav.
 - `app/chat.tsx` — Floating-chat destination: AI tutor chat UI with Bangla/English suggestions.
 - `app/subject/[id].tsx` — Per-subject detail with PDF Notes / Quizzes tabs, grade-aware.
 

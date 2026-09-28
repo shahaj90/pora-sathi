@@ -3,5 +3,6 @@
   { "id": "rahim", "name": "Rahim Sir", "subject": "Physics" },
   { "id": "fatema", "name": "Fatema Ma'am", "subject": "Chemistry" },
   { "id": "nasrin", "name": "Nasrin Ma'am", "subject": "Biology" },
-  { "id": "sadia", "name": "Sadia Ma'am", "subject": "English" }
+  { "id": "sadia", "name": "Sadia Ma'am", "subject": "English" },
+  { "id": "nayan", "name": "Nayan Sir", "subject": "Science" }
 ]

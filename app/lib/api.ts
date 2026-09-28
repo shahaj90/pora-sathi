@@ -2,16 +2,25 @@ import type {
   ContinueLearning,
   DashboardStats,
   Grade,
+  GradeId,
   Note,
   Quiz,
   SscBanner,
   Subject,
 } from '../constants/data';
-import dashboardJson from '../data/dashboard.json';
+import dashboardC8 from '../data/dashboard-c8.json';
+import dashboardC9 from '../data/dashboard-c9.json';
+import dashboardC10 from '../data/dashboard-c10.json';
 import gradesJson from '../data/grades.json';
-import notesJson from '../data/notes.json';
-import quizzesJson from '../data/quizzes.json';
-import subjectsJson from '../data/subjects.json';
+import notesC8 from '../data/notes-c8.json';
+import notesC9 from '../data/notes-c9.json';
+import notesC10 from '../data/notes-c10.json';
+import quizzesC8 from '../data/quizzes-c8.json';
+import quizzesC9 from '../data/quizzes-c9.json';
+import quizzesC10 from '../data/quizzes-c10.json';
+import subjectsC8 from '../data/subjects-c8.json';
+import subjectsC9 from '../data/subjects-c9.json';
+import subjectsC10 from '../data/subjects-c10.json';
 
 // ---------------------------------------------------------------------------
 // Demo API layer.
@@ -38,19 +47,43 @@ export async function fetchGrades(): Promise<Grade[]> {
   return gradesJson as Grade[];
 }
 
-export async function fetchSubjects(): Promise<Subject[]> {
+const SUBJECTS: Record<GradeId, Subject[]> = {
+  c8: subjectsC8 as Subject[],
+  c9: subjectsC9 as Subject[],
+  c10: subjectsC10 as Subject[],
+};
+
+const NOTES: Record<GradeId, Note[]> = {
+  c8: notesC8 as Note[],
+  c9: notesC9 as Note[],
+  c10: notesC10 as Note[],
+};
+
+const QUIZZES: Record<GradeId, Quiz[]> = {
+  c8: quizzesC8 as Quiz[],
+  c9: quizzesC9 as Quiz[],
+  c10: quizzesC10 as Quiz[],
+};
+
+const DASHBOARD: Record<GradeId, DashboardMeta> = {
+  c8: dashboardC8 as DashboardMeta,
+  c9: dashboardC9 as DashboardMeta,
+  c10: dashboardC10 as DashboardMeta,
+};
+
+export async function fetchSubjects(gradeId: GradeId): Promise<Subject[]> {
   await delay(MOCK_DELAY_MS);
-  return subjectsJson as Subject[];
+  return SUBJECTS[gradeId] ?? [];
 }
 
-export async function fetchNotes(): Promise<Note[]> {
+export async function fetchNotes(gradeId: GradeId): Promise<Note[]> {
   await delay(MOCK_DELAY_MS);
-  return notesJson as Note[];
+  return NOTES[gradeId] ?? [];
 }
 
-export async function fetchQuizzes(): Promise<Quiz[]> {
+export async function fetchQuizzes(gradeId: GradeId): Promise<Quiz[]> {
   await delay(MOCK_DELAY_MS);
-  return quizzesJson as Quiz[];
+  return QUIZZES[gradeId] ?? [];
 }
 
 export interface DashboardMeta {
@@ -59,7 +92,7 @@ export interface DashboardMeta {
   sscBanner: SscBanner;
 }
 
-export async function fetchDashboardMeta(): Promise<DashboardMeta> {
+export async function fetchDashboardMeta(gradeId: GradeId): Promise<DashboardMeta> {
   await delay(MOCK_DELAY_MS);
-  return dashboardJson as DashboardMeta;
+  return DASHBOARD[gradeId] ?? (dashboardC10 as DashboardMeta);
 }

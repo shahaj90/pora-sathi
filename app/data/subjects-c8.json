@@ -1,0 +1,68 @@
+[
+  {
+    "id": "mathematics",
+    "name": "Mathematics",
+    "bangla": "গণিত",
+    "icon": "calculator",
+    "chapters": 15,
+    "progress": 0.55,
+    "notesCount": 35,
+    "quizCount": 20,
+    "color": ["#6C3CE0", "#9D6BFF"]
+  },
+  {
+    "id": "science",
+    "name": "Science",
+    "bangla": "বিজ্ঞান",
+    "icon": "flask",
+    "chapters": 18,
+    "progress": 0.46,
+    "notesCount": 42,
+    "quizCount": 26,
+    "color": ["#0EA5E9", "#34D399"]
+  },
+  {
+    "id": "bangla1",
+    "name": "Bangla 1st Paper",
+    "bangla": "বাংলা ১ম পত্র",
+    "icon": "book-outline",
+    "chapters": 14,
+    "progress": 0.58,
+    "notesCount": 30,
+    "quizCount": 16,
+    "color": ["#DC2626", "#F87171"]
+  },
+  {
+    "id": "bangla2",
+    "name": "Bangla 2nd Paper",
+    "bangla": "বাংলা ২য় পত্র",
+    "icon": "create-outline",
+    "chapters": 12,
+    "progress": 0.5,
+    "notesCount": 26,
+    "quizCount": 14,
+    "color": ["#F59E0B", "#FBBF24"]
+  },
+  {
+    "id": "english1",
+    "name": "English 1st Paper",
+    "bangla": "ইংরেজি ১ম পত্র",
+    "icon": "language-outline",
+    "chapters": 12,
+    "progress": 0.52,
+    "notesCount": 24,
+    "quizCount": 15,
+    "color": ["#2563EB", "#60A5FA"]
+  },
+  {
+    "id": "english2",
+    "name": "English 2nd Paper",
+    "bangla": "ইংরেজি ২য় পত্র",
+    "icon": "chatbubble-outline",
+    "chapters": 10,
+    "progress": 0.48,
+    "notesCount": 22,
+    "quizCount": 13,
+    "color": ["#0891B2", "#22D3EE"]
+  }
+]

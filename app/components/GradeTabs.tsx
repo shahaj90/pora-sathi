@@ -23,8 +23,6 @@ export function GradeTabs({ grades, active, onChange }: Props) {
             selected={g.id === active}
             onToggle={() => onChange(g.id)}
             role="tab"
-            icon={g.id === 'ssc' ? 'trophy' : undefined}
-            accent={g.id === 'ssc'}
           />
         ))}
       </ScrollView>

@@ -52,9 +52,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [gradeChanging, setGradeChanging] = useState(false);
 
-  // TODO(api): accept a gradeId and request per-grade content,
-  // e.g. GET /subjects?grade=c10
-  const load = useCallback(async (initial: boolean) => {
+  const load = useCallback(async (gradeId: GradeId, initial: boolean) => {
     if (initial) {
       setLoading(true);
     } else {
@@ -65,10 +63,10 @@ export default function Dashboard() {
     try {
       const [g, s, n, q, meta] = await Promise.all([
         fetchGrades(),
-        fetchSubjects(),
-        fetchNotes(),
-        fetchQuizzes(),
-        fetchDashboardMeta(),
+        fetchSubjects(gradeId),
+        fetchNotes(gradeId),
+        fetchQuizzes(gradeId),
+        fetchDashboardMeta(gradeId),
       ]);
       setGrades(g);
       setSubjects(s);
@@ -87,12 +85,12 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    load(true);
-  }, [load]);
+    load(grade, true);
+  }, [load, grade]);
 
   const changeGrade = (g: GradeId) => {
     setGrade(g);
-    load(false);
+    load(g, false);
   };
 
   const q = query.trim().toLowerCase();
@@ -157,7 +155,7 @@ export default function Dashboard() {
             title="Couldn't load your dashboard"
             subtitle={error ?? 'Something went wrong.'}
             actionTitle="Retry"
-            onAction={() => load(true)}
+            onAction={() => load(grade, true)}
           />
         </View>
       </SafeAreaView>

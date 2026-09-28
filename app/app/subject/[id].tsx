@@ -1,29 +1,63 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { Note, Quiz, Subject } from '../../constants/data';
+import type { GradeId, Note, Quiz, Subject } from '../../constants/data';
 import { Colors, Radius } from '../../constants/theme';
-import notesJson from '../../data/notes.json';
-import quizzesJson from '../../data/quizzes.json';
-import subjectsJson from '../../data/subjects.json';
+import notesC8 from '../../data/notes-c8.json';
+import notesC9 from '../../data/notes-c9.json';
+import notesC10 from '../../data/notes-c10.json';
+import quizzesC8 from '../../data/quizzes-c8.json';
+import quizzesC9 from '../../data/quizzes-c9.json';
+import quizzesC10 from '../../data/quizzes-c10.json';
+import subjectsC8 from '../../data/subjects-c8.json';
+import subjectsC9 from '../../data/subjects-c9.json';
+import subjectsC10 from '../../data/subjects-c10.json';
 
-const SUBJECTS = subjectsJson as Subject[];
-const NOTES = notesJson as Note[];
-const QUIZZES = quizzesJson as Quiz[];
+const SUBJECTS: Record<GradeId, Subject[]> = {
+  c8: subjectsC8 as Subject[],
+  c9: subjectsC9 as Subject[],
+  c10: subjectsC10 as Subject[],
+};
+
+const NOTES: Record<GradeId, Note[]> = {
+  c8: notesC8 as Note[],
+  c9: notesC9 as Note[],
+  c10: notesC10 as Note[],
+};
+
+const QUIZZES: Record<GradeId, Quiz[]> = {
+  c8: quizzesC8 as Quiz[],
+  c9: quizzesC9 as Quiz[],
+  c10: quizzesC10 as Quiz[],
+};
+
+const DEFAULT_GRADE: GradeId = 'c10';
 
 export default function SubjectDetail() {
   const { id, grade, tab } = useLocalSearchParams<{ id: string; grade?: string; tab?: string }>();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'notes' | 'quiz'>(tab === 'quiz' ? 'quiz' : 'notes');
 
-  const subject = SUBJECTS.find((s) => s.id === id) ?? SUBJECTS[0];
-  const notes = NOTES.filter((n) => n.subjectId === subject.id);
-  const fallbackNotes = NOTES.slice(0, 3);
-  const quizzes = QUIZZES.filter((q) => q.subjectId === subject.id);
-  const fallbackQuiz = QUIZZES.slice(0, 2);
+  const gradeId = (grade as GradeId) ?? DEFAULT_GRADE;
+  const subjects = SUBJECTS[gradeId] ?? SUBJECTS[DEFAULT_GRADE];
+  const subject = subjects.find((s) => s.id === id) ?? subjects[0];
+
+  const notes = useMemo(() => {
+    const list = NOTES[gradeId] ?? NOTES[DEFAULT_GRADE];
+    return list.filter((n) => n.subjectId === subject.id);
+  }, [gradeId, subject.id]);
+
+  const fallbackNotes = useMemo(() => NOTES[gradeId] ?? NOTES[DEFAULT_GRADE], [gradeId]);
+
+  const quizzes = useMemo(() => {
+    const list = QUIZZES[gradeId] ?? QUIZZES[DEFAULT_GRADE];
+    return list.filter((q) => q.subjectId === subject.id);
+  }, [gradeId, subject.id]);
+
+  const fallbackQuiz = useMemo(() => QUIZZES[gradeId] ?? QUIZZES[DEFAULT_GRADE], [gradeId]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -41,9 +75,7 @@ export default function SubjectDetail() {
             <Pressable onPress={() => router.back()} style={styles.back}>
               <Ionicons name="arrow-back" size={20} color={Colors.surface} />
             </Pressable>
-            <Text style={styles.gradePill}>
-              {grade === 'ssc' ? 'SSC' : `Class ${grade?.replace('c', '') ?? '10'}`}
-            </Text>
+            <Text style={styles.gradePill}>Class {gradeId.replace('c', '')}</Text>
           </View>
           <View style={styles.iconBubble}>
             <Ionicons name={subject.icon} size={28} color={Colors.surface} />

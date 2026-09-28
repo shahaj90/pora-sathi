@@ -24,8 +24,8 @@ interface Msg {
 const SUGGESTIONS = [
   'Quadratic equation বুঝিয়ে দাও',
   "Newton's 2nd law example দাও",
-  'SSC English paragraph format',
-  'Photosynthesis quiz নাও',
+  'SSC English 2nd Paper paragraph format',
+  'বাংলা ১ম পত্র কবিতা ব্যাখ্যা দাও',
 ];
 
 export default function ChatScreen() {
@@ -34,7 +34,7 @@ export default function ChatScreen() {
     {
       id: '1',
       role: 'ai',
-      text: 'Assalamu Alaikum! আমি পড়া সাথী 👋\nClass 10-এর কোন topic-এ help লাগবে? Math, Physics, Chemistry, Biology, English — যেকোনো প্রশ্ন করো, বাংলায় বা English-এ।',
+      text: 'Assalamu Alaikum! আমি পড়া সাথী 👋\nClass 8-10-এর কোন topic-এ help লাগবে? Math, Science/Physics/Chemistry/Biology, Bangla 1st/2nd Paper, English 1st/2nd Paper — যেকোনো প্রশ্ন করো, বাংলায় বা English-এ।',
     },
   ]);
   const [input, setInput] = useState('');

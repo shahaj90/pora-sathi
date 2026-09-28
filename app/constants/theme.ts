@@ -43,7 +43,11 @@ export const SubjectColors: Record<string, [string, string]> = {
   physics: ['#0EA5E9', '#22D3EE'], // sky cyan
   chemistry: ['#10B981', '#34D399'], // emerald
   biology: ['#84CC16', '#A3E635'], // lime
-  english: ['#F43F5E', '#FB923C'], // rose-orange
+  science: ['#0EA5E9', '#34D399'], // sky-emerald blend
+  bangla1: ['#DC2626', '#F87171'], // rose-red
+  bangla2: ['#F59E0B', '#FBBF24'], // amber
+  english1: ['#2563EB', '#60A5FA'], // blue
+  english2: ['#0891B2', '#22D3EE'], // cyan-teal
 };
 
 export const Gradients = {

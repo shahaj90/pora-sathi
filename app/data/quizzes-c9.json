@@ -1,0 +1,70 @@
+[
+  {
+    "id": "q9-1",
+    "subjectId": "mathematics",
+    "title": "Algebra Sprint",
+    "questions": 15,
+    "minutes": 20,
+    "difficulty": "Medium",
+    "attempts": "3.5k",
+    "bestScore": 78
+  },
+  {
+    "id": "q9-2",
+    "subjectId": "physics",
+    "title": "Newton Laws Challenge",
+    "questions": 12,
+    "minutes": 15,
+    "difficulty": "Hard",
+    "attempts": "2.8k",
+    "bestScore": 67
+  },
+  {
+    "id": "q9-3",
+    "subjectId": "chemistry",
+    "title": "Periodic Table Blitz",
+    "questions": 10,
+    "minutes": 10,
+    "difficulty": "Easy",
+    "attempts": "4.1k",
+    "bestScore": 90
+  },
+  {
+    "id": "q9-4",
+    "subjectId": "bangla1",
+    "title": "বাংলা ১ম পত্র — সাহিত্য কুইজ",
+    "questions": 14,
+    "minutes": 14,
+    "difficulty": "Medium",
+    "attempts": "2.7k",
+    "bestScore": 82
+  },
+  {
+    "id": "q9-5",
+    "subjectId": "bangla2",
+    "title": "বাংলা ব্যাকরণ ক্লাস ৯",
+    "questions": 12,
+    "minutes": 12,
+    "difficulty": "Medium",
+    "attempts": "2.4k",
+    "bestScore": 84
+  },
+  {
+    "id": "q9-6",
+    "subjectId": "english1",
+    "title": "Seen & Unseen Passage Test",
+    "questions": 16,
+    "minutes": 15,
+    "difficulty": "Medium",
+    "attempts": "3.8k"
+  },
+  {
+    "id": "q9-7",
+    "subjectId": "english2",
+    "title": "Vocabulary Master — Class 9",
+    "questions": 18,
+    "minutes": 15,
+    "difficulty": "Medium",
+    "attempts": "4.8k"
+  }
+]

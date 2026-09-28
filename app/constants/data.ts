@@ -1,6 +1,6 @@
 import type { Ionicons } from '@expo/vector-icons';
 
-export type GradeId = 'c5' | 'c6' | 'c7' | 'c8' | 'c9' | 'c10' | 'ssc';
+export type GradeId = 'c8' | 'c9' | 'c10';
 
 export interface Grade {
   id: GradeId;
@@ -9,7 +9,16 @@ export interface Grade {
   bangla: string;
 }
 
-export type SubjectId = 'mathematics' | 'physics' | 'chemistry' | 'biology' | 'english';
+export type SubjectId =
+  | 'mathematics'
+  | 'physics'
+  | 'chemistry'
+  | 'biology'
+  | 'science'
+  | 'bangla1'
+  | 'bangla2'
+  | 'english1'
+  | 'english2';
 
 export interface Subject {
   id: SubjectId;
