@@ -1,22 +1,22 @@
-import { useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ClassHeader } from '../../components/ClassHeader';
 import { ProgressSection } from '../../components/ProgressSection';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { useColors } from '../../context/ColorSchemeContext';
+import { useGrade } from '../../context/GradeContext';
 import { useSubjects } from '../../lib/useDashboardData';
-import type { GradeId } from '../../constants/data';
 
 export default function ProgressTab() {
   const { colors: C } = useColors();
-  const [grade] = useState<GradeId>('c10');
-  const { data: subjects, isLoading, isError } = useSubjects(grade);
+  const { grade, gradeLabel } = useGrade();
+  const { data: subjects, isLoading, isError, refetch } = useSubjects(grade);
 
   const s = makeStyles(C);
 
   if (isLoading) {
     return (
-      <SafeAreaView style={s.safe}>
+      <SafeAreaView style={s.safe} edges={['left', 'right', 'bottom']}>
         <View style={s.center}>
           <EmptyState icon="analytics-outline" title="Loading progress…" subtitle="Please wait" />
         </View>
@@ -26,39 +26,51 @@ export default function ProgressTab() {
 
   if (isError) {
     return (
-      <SafeAreaView style={s.safe}>
+      <SafeAreaView style={s.safe} edges={['left', 'right', 'bottom']}>
         <View style={s.center}>
           <EmptyState
             icon="alert-circle-outline"
             title="Couldn't load progress"
             subtitle="Check your connection and try again."
             actionTitle="Retry"
-            onAction={() => {}}
+            onAction={() => void refetch()}
           />
         </View>
       </SafeAreaView>
     );
   }
 
-  if (!subjects || subjects.length === 0) {
-    return (
-      <SafeAreaView style={s.safe}>
-        <View style={s.center}>
-          <EmptyState
-            icon="analytics-outline"
-            title="No Subjects"
-            subtitle="Subjects will appear here when available for this class."
-          />
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const items = subjects ?? [];
 
   return (
-    <SafeAreaView style={s.safe}>
+    <SafeAreaView style={s.safe} edges={['left', 'right', 'bottom']}>
       <View style={s.container}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
-          <ProgressSection subjects={subjects} onOpen={() => {}} />
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={s.scroll}
+          stickyHeaderIndices={[0]}
+        >
+          <ClassHeader
+            title="Your Progress"
+            bangla="আপনার অগ্রগতি"
+            count={
+              items.length === 0
+                ? `No subjects for ${gradeLabel} yet`
+                : `${items.length} ${items.length === 1 ? 'subject' : 'subjects'} in ${gradeLabel}`
+            }
+          />
+
+          {items.length === 0 ? (
+            <View style={s.empty}>
+              <EmptyState
+                icon="analytics-outline"
+                title="No Subjects"
+                subtitle={`There are no subjects for ${gradeLabel} yet. Try another class.`}
+              />
+            </View>
+          ) : (
+            <ProgressSection subjects={items} onOpen={() => {}} />
+          )}
           <View style={s.spacer} />
         </ScrollView>
       </View>
@@ -79,5 +91,6 @@ const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
       gap: 12,
       padding: 24,
     },
+    empty: { marginTop: 8 },
     spacer: { height: 36 },
   });

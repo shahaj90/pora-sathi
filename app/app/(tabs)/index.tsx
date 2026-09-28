@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { useColors } from '../../context/ColorSchemeContext';
+import { useGrade } from '../../context/GradeContext';
 import { ChatFAB } from '../../components/ChatFAB';
 import { BottomSheetMenu, type MenuItem } from '../../components/ui/BottomSheetMenu';
 import { ContentSkeleton, DashboardSkeleton } from '../../components/DashboardSkeleton';
@@ -14,18 +15,17 @@ import { NotesCarousel, QuizCarousel } from '../../components/Library';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { SubjectGrid } from '../../components/SubjectGrid';
 import { SscBannerCard } from '../../components/SscBanner';
-import { useDashboard, useGrades } from '../../lib/useDashboardData';
-import type { GradeId, Note, Quiz, Subject } from '../../constants/data';
+import { useDashboard } from '../../lib/useDashboardData';
+import type { Note, Quiz, Subject } from '../../constants/data';
 
 export default function HomeTab() {
   const { colors: C } = useColors();
   const router = useRouter();
-  const { user, restoring, logout } = useAuth();
-  const [grade, setGrade] = useState<GradeId>('c10');
+  const { user, restoring: authRestoring, logout } = useAuth();
+  const { grade, setGrade, grades, restoring: gradeRestoring } = useGrade();
   const [query, setQuery] = useState('');
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const { data: grades } = useGrades();
   const { subjects, notes, quizzes, meta, isLoading, isError, error } = useDashboard(grade);
 
   const q = query.trim().toLowerCase();
@@ -78,7 +78,7 @@ export default function HomeTab() {
     },
   ];
 
-  if (restoring || (isLoading && !query)) {
+  if (authRestoring || gradeRestoring || (isLoading && !query)) {
     return <DashboardSkeleton />;
   }
 
@@ -115,7 +115,7 @@ export default function HomeTab() {
             onProfile={() => setMenuVisible(true)}
           />
           <View style={gradeWrap}>
-            <GradeTabs grades={grades ?? []} active={grade} onChange={setGrade} />
+            <GradeTabs grades={grades} active={grade} onChange={setGrade} />
           </View>
 
           {isLoading && query.length === 0 ? (

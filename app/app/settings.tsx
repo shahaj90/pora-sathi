@@ -24,6 +24,7 @@ import { type Grade, type GradeId, type Teacher } from '../constants/data';
 import { Radius } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { useColors, type ThemePreference } from '../context/ColorSchemeContext';
+import { useGrade } from '../context/GradeContext';
 import gradesJson from '../data/grades.json';
 import teachersJson from '../data/teachers.json';
 
@@ -44,6 +45,7 @@ export default function SettingsScreen() {
   const { colors: C, scheme, preference, setPreference } = useColors();
   const router = useRouter();
   const { user, updateUser, logout } = useAuth();
+  const { grade: activeGrade, setGrade: setActiveGrade, gradeLabel } = useGrade();
 
   const [gradeIds, setGradeIds] = useState<GradeId[]>(
     (user?.grades
@@ -109,6 +111,43 @@ export default function SettingsScreen() {
                   onToggle={() => toggleGrade(g.id)}
                 />
               ))}
+            </View>
+
+            <View style={s.browseBlock}>
+              <View style={s.browseHeader}>
+                <Ionicons name="compass-outline" size={18} color={C.primary} />
+                <Text style={s.browseTitle}>Browsing Class</Text>
+                <Text style={s.browseValue}>{gradeLabel}</Text>
+              </View>
+              <View style={s.browseOptions}>
+                {GRADES.map((g) => {
+                  const active = activeGrade === g.id;
+                  return (
+                    <Pressable
+                      key={g.id}
+                      onPress={() => setActiveGrade(g.id)}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected: active }}
+                      style={[
+                        s.browseOption,
+                        active && { backgroundColor: C.primary, borderColor: C.primary },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          s.browseOptionText,
+                          { color: active ? C.surface : C.textSecondary },
+                        ]}
+                      >
+                        {g.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              <Text style={s.browseHint}>
+                Subjects, notes, quizzes and progress all follow this class.
+              </Text>
             </View>
 
             <Text style={s.sectionTitle}>Preferred Teacher</Text>
@@ -261,6 +300,31 @@ const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
     card: screenCard(C),
     sectionTitle: screenSectionTitle(C),
     chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 6 },
+    browseBlock: {
+      backgroundColor: C.background,
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: Radius.md,
+      padding: 12,
+      gap: 10,
+      marginBottom: 4,
+    },
+    browseHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    browseTitle: { flex: 1, fontSize: 14, fontWeight: '800', color: C.text },
+    browseValue: { fontSize: 12, fontWeight: '700', color: C.textSecondary },
+    browseOptions: { flexDirection: 'row', gap: 8 },
+    browseOption: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 10,
+      borderRadius: Radius.sm,
+      borderWidth: 1,
+      borderColor: C.border,
+      backgroundColor: C.surface,
+    },
+    browseOptionText: { fontSize: 12, fontWeight: '700' },
+    browseHint: { fontSize: 11, color: C.muted },
     teachers: { gap: 8, marginBottom: 8 },
     teacherCard: {
       flexDirection: 'row',

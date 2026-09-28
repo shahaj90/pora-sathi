@@ -7,17 +7,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { GradeId } from '../../constants/data';
 import { Radius } from '../../constants/theme';
 import { useColors } from '../../context/ColorSchemeContext';
+import { useGrade } from '../../context/GradeContext';
 import { getNotesForGrade, getQuizzesForGrade, getSubjectsForGrade } from '../../lib/api';
-
-const DEFAULT_GRADE: GradeId = 'c10';
 
 export default function SubjectDetail() {
   const { colors: C } = useColors();
   const { id, grade, tab } = useLocalSearchParams<{ id: string; grade?: string; tab?: string }>();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'notes' | 'quiz'>(tab === 'quiz' ? 'quiz' : 'notes');
+  const { grade: activeGrade, gradeLabel } = useGrade();
 
-  const gradeId = (grade as GradeId) ?? DEFAULT_GRADE;
+  // The link carries the class it was opened from; fall back to whatever class
+  // is currently selected so a deep link still lands on the right content.
+  const gradeId = (grade as GradeId) ?? activeGrade;
   const subjects = getSubjectsForGrade(gradeId);
   const subject = subjects.find((s) => s.id === id) ?? subjects[0];
 
@@ -51,7 +53,7 @@ export default function SubjectDetail() {
             <Pressable onPress={() => router.back()} style={s.back}>
               <Ionicons name="arrow-back" size={20} color={C.surface} />
             </Pressable>
-            <Text style={s.gradePill}>Class {gradeId.replace('c', '')}</Text>
+            <Text style={s.gradePill}>{gradeLabel}</Text>
           </View>
           <View style={s.iconBubble}>
             <Ionicons name={subject.icon} size={28} color={C.surface} />
