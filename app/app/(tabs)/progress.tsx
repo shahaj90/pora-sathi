@@ -69,7 +69,9 @@ export default function ProgressTab() {
               />
             </View>
           ) : (
-            <ProgressSection subjects={items} onOpen={() => {}} />
+            <View style={s.content}>
+              <ProgressSection subjects={items} onOpen={() => {}} />
+            </View>
           )}
           <View style={s.spacer} />
         </ScrollView>
@@ -91,6 +93,7 @@ const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
       gap: 12,
       padding: 24,
     },
-    empty: { marginTop: 8 },
+    empty: { marginTop: 16 },
+    content: { marginTop: 16 },
     spacer: { height: 36 },
   });

@@ -29,7 +29,7 @@ export function ClassHeader({ title, bangla, count }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.wrap, { paddingTop: insets.top + 12, backgroundColor: C.background }]}>
+    <View style={[styles.wrap, { paddingTop: insets.top + 16, backgroundColor: C.background }]}>
       <LinearGradient
         colors={Gradients.header}
         start={{ x: 0, y: 0 }}
@@ -49,14 +49,16 @@ export function ClassHeader({ title, bangla, count }: Props) {
         {count ? <Text style={styles.count}>{count}</Text> : null}
       </LinearGradient>
 
-      <GradeTabs grades={grades} active={grade} onChange={setGrade} />
+      <View style={styles.tabsWrap}>
+        <GradeTabs grades={grades} active={grade} onChange={setGrade} />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: {
-    paddingBottom: 4,
+    paddingBottom: 16,
     // Sticky headers need an elevation on Android, otherwise the list scrolls
     // straight over them instead of underneath.
     elevation: 2,
@@ -65,8 +67,9 @@ const styles = StyleSheet.create({
   banner: {
     marginHorizontal: 16,
     borderRadius: Radius.lg,
-    padding: 16,
+    padding: 18,
   },
+  tabsWrap: { marginTop: 14 },
   bannerRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',

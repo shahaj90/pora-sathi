@@ -69,7 +69,9 @@ export default function QuizTab() {
               />
             </View>
           ) : (
-            <QuizSection quizzes={items} onPlay={() => {}} />
+            <View style={s.content}>
+              <QuizSection quizzes={items} onPlay={() => {}} />
+            </View>
           )}
           <View style={s.spacer} />
         </ScrollView>
@@ -91,6 +93,7 @@ const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
       gap: 12,
       padding: 24,
     },
-    empty: { marginTop: 8 },
+    empty: { marginTop: 16 },
+    content: { marginTop: 16 },
     spacer: { height: 36 },
   });
