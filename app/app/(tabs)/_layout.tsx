@@ -35,15 +35,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="notes"
+        name="books"
         options={{
-          title: 'Notes',
+          title: 'Books',
           tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'document-text' : 'document-text-outline'}
-              size={22}
-              color={color}
-            />
+            <Ionicons name={focused ? 'book' : 'book-outline'} size={22} color={color} />
           ),
         }}
       />

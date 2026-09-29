@@ -20,26 +20,25 @@ export type SubjectId =
   | 'english1'
   | 'english2';
 
+export interface Chapter {
+  id: string;
+  title: string;
+  pageStart: number;
+  pageEnd: number;
+}
+
 export interface Subject {
   id: SubjectId;
   name: string;
   bangla: string;
   icon: keyof typeof Ionicons.glyphMap;
-  chapters: number;
+  chapterCount: number;
   progress: number; // 0-1
-  notesCount: number;
+  booksCount: number;
   quizCount: number;
   color: [string, string];
-}
-
-export interface Note {
-  id: string;
-  subjectId: SubjectId;
-  title: string;
-  chapter: string;
-  pages: number;
-  size: string;
-  downloads: string;
+  pdfFile: string; // filename inside assets/books/
+  chapters: Chapter[];
 }
 
 export interface Quiz {
@@ -56,7 +55,7 @@ export interface Quiz {
 export interface DashboardStats {
   syllabusPct: number;
   quizzesDone: number;
-  notesCount: number;
+  booksCount: number;
   streak: number;
 }
 

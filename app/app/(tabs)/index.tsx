@@ -11,12 +11,12 @@ import { ContentSkeleton, DashboardSkeleton } from '../../components/DashboardSk
 import { EmptyState } from '../../components/ui/EmptyState';
 import { GradeTabs } from '../../components/GradeTabs';
 import { ContinueCard, HomeHeader } from '../../components/Header';
-import { NotesCarousel, QuizCarousel } from '../../components/Library';
+import { BooksCarousel, QuizCarousel } from '../../components/Library';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { SubjectGrid } from '../../components/SubjectGrid';
 import { SscBannerCard } from '../../components/SscBanner';
 import { useDashboard } from '../../lib/useDashboardData';
-import type { Note, Quiz, Subject } from '../../constants/data';
+import type { Quiz, Subject } from '../../constants/data';
 
 export default function HomeTab() {
   const { colors: C } = useColors();
@@ -26,7 +26,7 @@ export default function HomeTab() {
   const [query, setQuery] = useState('');
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const { subjects, notes, quizzes, meta, isLoading, isError, error } = useDashboard(grade);
+  const { subjects, quizzes, meta, isLoading, isError, error } = useDashboard(grade);
 
   const q = query.trim().toLowerCase();
   const filteredSubjects = useMemo(
@@ -38,14 +38,17 @@ export default function HomeTab() {
         : subjects,
     [subjects, q],
   );
-  const filteredNotes = useMemo(
+  const filteredBooks = useMemo(
     () =>
       q
-        ? notes.filter(
-            (n: Note) => n.title.toLowerCase().includes(q) || n.chapter.toLowerCase().includes(q),
+        ? subjects.filter(
+            (s: Subject) =>
+              s.name.toLowerCase().includes(q) ||
+              s.bangla.toLowerCase().includes(q) ||
+              s.chapters.some((c) => c.title.toLowerCase().includes(q)),
           )
-        : notes,
-    [notes, q],
+        : subjects,
+    [subjects, q],
   );
   const filteredQuizzes = useMemo(
     () => (q ? quizzes.filter((t: Quiz) => t.title.toLowerCase().includes(q)) : quizzes),
@@ -53,7 +56,7 @@ export default function HomeTab() {
   );
 
   const openSubject = (s: Subject) => router.push(`/subject/${s.id}?grade=${grade}`);
-  const openNote = (n: Note) => router.push(`/subject/${n.subjectId}?grade=${grade}`);
+  const openBook = (s: Subject) => router.push(`/subject/${s.id}?grade=${grade}&tab=book`);
   const openQuiz = (t: Quiz) => router.push(`/subject/${t.subjectId}?grade=${grade}&tab=quiz`);
   const openChat = () => router.push('/chat');
 
@@ -126,7 +129,7 @@ export default function HomeTab() {
                 <View>
                   <SectionHeader
                     title={`Results for "${query.trim()}"`}
-                    bangla={`${filteredSubjects.length + filteredNotes.length + filteredQuizzes.length} matches`}
+                    bangla={`${filteredSubjects.length + filteredBooks.length + filteredQuizzes.length} matches`}
                   />
                   {filteredSubjects.length > 0 ? (
                     <View>
@@ -134,10 +137,10 @@ export default function HomeTab() {
                       <SubjectGrid subjects={filteredSubjects} onOpen={openSubject} compact />
                     </View>
                   ) : null}
-                  {filteredNotes.length > 0 ? (
+                  {filteredBooks.length > 0 ? (
                     <View>
-                      <SectionHeader title="PDF Notes" />
-                      <NotesCarousel notes={filteredNotes} onOpen={openNote} limit={4} />
+                      <SectionHeader title="Books" />
+                      <BooksCarousel books={filteredBooks} onOpen={openBook} limit={4} />
                     </View>
                   ) : null}
                   {filteredQuizzes.length > 0 ? (
@@ -147,7 +150,7 @@ export default function HomeTab() {
                     </View>
                   ) : null}
                   {filteredSubjects.length === 0 &&
-                  filteredNotes.length === 0 &&
+                  filteredBooks.length === 0 &&
                   filteredQuizzes.length === 0 ? (
                     <EmptyState
                       icon="search-outline"
@@ -165,12 +168,12 @@ export default function HomeTab() {
                   <SubjectGrid subjects={subjects} onOpen={openSubject} compact />
                   <SscBannerCard banner={meta.sscBanner} onPress={openChat} />
                   <SectionHeader
-                    title="Quick Notes"
-                    bangla="নোটস"
+                    title="Quick Books"
+                    bangla="বইসমূহ"
                     action="View all"
-                    onAction={() => router.push('/(tabs)/notes')}
+                    onAction={() => router.push('/(tabs)/books')}
                   />
-                  <NotesCarousel notes={notes} onOpen={openNote} />
+                  <BooksCarousel books={subjects} onOpen={openBook} />
                   <SectionHeader
                     title="Quick Quizzes"
                     bangla="কুইজ"

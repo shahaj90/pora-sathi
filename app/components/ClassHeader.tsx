@@ -8,16 +8,16 @@ import { useColors } from '../context/ColorSchemeContext';
 import { GradeTabs } from './GradeTabs';
 
 interface Props {
-  /** Tab title, e.g. "All PDF Notes". */
+  /** Tab title, e.g. "All Books". */
   title: string;
   /** Bangla subtitle shown under the title. */
   bangla?: string;
-  /** Count line under the class strip, e.g. "12 notes". */
+  /** Count line under the class strip, e.g. "12 books". */
   count?: string;
 }
 
 /**
- * Header for the class-scoped tabs (Notes, Quiz, Progress).
+ * Header for the class-scoped tabs (Books, Quiz, Progress).
  *
  * Every list in this app is filtered by the selected class, so the class is
  * shown as an explicit banner with the picker inline — otherwise a learner

@@ -4,38 +4,48 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { GradeId } from '../../constants/data';
+import type { Chapter, GradeId, Subject } from '../../constants/data';
 import { Radius } from '../../constants/theme';
 import { useColors } from '../../context/ColorSchemeContext';
 import { useGrade } from '../../context/GradeContext';
-import { getNotesForGrade, getQuizzesForGrade, getSubjectsForGrade } from '../../lib/api';
+import { getQuizzesForGrade, getSubjectForGrade } from '../../lib/api';
 
 export default function SubjectDetail() {
   const { colors: C } = useColors();
   const { id, grade, tab } = useLocalSearchParams<{ id: string; grade?: string; tab?: string }>();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'notes' | 'quiz'>(tab === 'quiz' ? 'quiz' : 'notes');
+  const [activeTab, setActiveTab] = useState<'book' | 'quiz'>(tab === 'quiz' ? 'quiz' : 'book');
   const { grade: activeGrade, gradeLabel } = useGrade();
 
   // The link carries the class it was opened from; fall back to whatever class
   // is currently selected so a deep link still lands on the right content.
   const gradeId = (grade as GradeId) ?? activeGrade;
-  const subjects = getSubjectsForGrade(gradeId);
-  const subject = subjects.find((s) => s.id === id) ?? subjects[0];
-
-  const notes = useMemo(() => {
-    return getNotesForGrade(gradeId).filter((n) => n.subjectId === subject.id);
-  }, [gradeId, subject.id]);
-
-  const fallbackNotes = useMemo(() => getNotesForGrade(gradeId), [gradeId]);
+  const subject = getSubjectForGrade(gradeId, id as Subject['id']);
 
   const quizzes = useMemo(() => {
-    return getQuizzesForGrade(gradeId).filter((q) => q.subjectId === subject.id);
-  }, [gradeId, subject.id]);
+    return getQuizzesForGrade(gradeId).filter((q) => q.subjectId === subject?.id);
+  }, [gradeId, subject?.id]);
 
   const fallbackQuiz = useMemo(() => getQuizzesForGrade(gradeId), [gradeId]);
 
   const s = makeStyles(C);
+
+  if (!subject) {
+    return (
+      <SafeAreaView style={s.safe}>
+        <View style={s.center}>
+          <Text style={s.centerText}>Subject not found.</Text>
+          <Pressable onPress={() => router.back()} style={s.backBtn}>
+            <Text style={s.backBtnText}>Go back</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const openChapter = (chapter: Chapter) => {
+    router.push(`/reader/${subject.id}/${chapter.id}?grade=${gradeId}`);
+  };
 
   return (
     <SafeAreaView style={s.safe}>
@@ -60,12 +70,12 @@ export default function SubjectDetail() {
           </View>
           <Text style={s.name}>{subject.name}</Text>
           <Text style={s.bangla}>
-            {subject.bangla} · {subject.chapters} chapters
+            {subject.bangla} · {subject.chapterCount} chapters
           </Text>
           <View style={s.statRow}>
             <View style={s.stat}>
-              <Text style={s.statV}>{subject.notesCount}</Text>
-              <Text style={s.statL}>PDF Notes</Text>
+              <Text style={s.statV}>{subject.chapterCount}</Text>
+              <Text style={s.statL}>Chapters</Text>
             </View>
             <View style={s.stat}>
               <Text style={s.statV}>{subject.quizCount}</Text>
@@ -80,15 +90,15 @@ export default function SubjectDetail() {
 
         <View style={s.tabRow}>
           <Pressable
-            onPress={() => setActiveTab('notes')}
-            style={[s.tab, activeTab === 'notes' && s.tabActive]}
+            onPress={() => setActiveTab('book')}
+            style={[s.tab, activeTab === 'book' && s.tabActive]}
           >
             <Ionicons
-              name="document-text"
+              name="book"
               size={16}
-              color={activeTab === 'notes' ? C.surface : C.textSecondary}
+              color={activeTab === 'book' ? C.surface : C.textSecondary}
             />
-            <Text style={[s.tabText, activeTab === 'notes' && s.tabTextActive]}>PDF Notes</Text>
+            <Text style={[s.tabText, activeTab === 'book' && s.tabTextActive]}>Read Book</Text>
           </Pressable>
           <Pressable
             onPress={() => setActiveTab('quiz')}
@@ -103,21 +113,21 @@ export default function SubjectDetail() {
           </Pressable>
         </View>
 
-        {activeTab === 'notes' ? (
+        {activeTab === 'book' ? (
           <View style={s.list}>
-            {(notes.length ? notes : fallbackNotes).map((n) => (
-              <View key={n.id} style={s.card}>
-                <View style={s.pdf}>
-                  <Text style={s.pdfText}>PDF</Text>
+            {subject.chapters.map((chapter) => (
+              <Pressable key={chapter.id} style={s.card} onPress={() => openChapter(chapter)}>
+                <View style={[s.pdf, { backgroundColor: C.primary }]}>
+                  <Ionicons name="book-outline" size={18} color={C.surface} />
                 </View>
                 <View style={s.fill}>
-                  <Text style={s.cardTitle}>{n.title}</Text>
+                  <Text style={s.cardTitle}>{chapter.title}</Text>
                   <Text style={s.cardSub}>
-                    {n.chapter} · {n.pages} pages · {n.size}
+                    Pages {chapter.pageStart}–{chapter.pageEnd}
                   </Text>
                 </View>
-                <Ionicons name="download-outline" size={20} color={C.primary} />
-              </View>
+                <Ionicons name="chevron-forward" size={20} color={C.primary} />
+              </Pressable>
             ))}
           </View>
         ) : (
@@ -152,6 +162,21 @@ const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
   StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.background },
     fill: { flex: 1 },
+    center: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+      gap: 12,
+    },
+    centerText: { fontSize: 14, color: C.textSecondary },
+    backBtn: {
+      backgroundColor: C.primary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 999,
+    },
+    backBtnText: { color: C.surface, fontWeight: '800' },
     hero: {
       paddingTop: 54,
       paddingHorizontal: 16,
@@ -236,7 +261,6 @@ const makeStyles = (C: ReturnType<typeof useColors>['colors']) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
-    pdfText: { color: C.surface, fontWeight: '900', fontSize: 12 },
     cardTitle: { fontSize: 13.5, fontWeight: '800', color: C.text },
     cardSub: { fontSize: 11.5, color: C.textSecondary, marginTop: 3 },
     start: { color: C.accent, fontWeight: '800', fontSize: 13 },

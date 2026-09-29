@@ -1,39 +1,61 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
-import { type Note, type Quiz } from '../constants/data';
+import { type Quiz, type Subject } from '../constants/data';
+import { Radius, Shadow } from '../constants/theme';
 import { useColors } from '../context/ColorSchemeContext';
 import { Card } from './ui/Card';
 
 // ---------------------------------------------------------------------------
-// NotesSection — 2-column grid (for full list views)
+// BooksSection — 2-column grid (for full list views)
 // ---------------------------------------------------------------------------
 
-export function NotesSection({ notes, onOpen }: { notes: Note[]; onOpen: (n: Note) => void }) {
+export function BooksSection({
+  books,
+  onOpen,
+}: {
+  books: Subject[];
+  onOpen: (s: Subject) => void;
+}) {
+  const { width } = useWindowDimensions();
+  const gap = 12;
+  const padding = 32; // 16 * 2
+  const columns = 2;
+  const cardWidth = Math.floor((width - padding - gap) / columns);
+
   return (
-    <View style={rowStyle}>
-      {notes.map((n) => (
-        <NoteCard key={n.id} note={n} onOpen={onOpen} />
-      ))}
+    <View style={gridWrap}>
+      {books.map((s, i) => {
+        const isLastInRow = (i + 1) % columns === 0;
+        return (
+          <BookCard
+            key={s.id}
+            subject={s}
+            onOpen={onOpen}
+            style={{ width: cardWidth, marginRight: isLastInRow ? 0 : gap }}
+          />
+        );
+      })}
     </View>
   );
 }
 
 // ---------------------------------------------------------------------------
-// NotesCarousel — horizontal scroll (for home preview)
+// BooksCarousel — horizontal scroll (for home preview)
 // ---------------------------------------------------------------------------
 
-export function NotesCarousel({
-  notes,
+export function BooksCarousel({
+  books,
   onOpen,
   limit = 4,
 }: {
-  notes: Note[];
-  onOpen: (n: Note) => void;
+  books: Subject[];
+  onOpen: (s: Subject) => void;
   limit?: number;
 }) {
   const { width } = useWindowDimensions();
   const cardWidth = width * 0.62;
-  const items = notes.slice(0, limit);
+  const items = books.slice(0, limit);
 
   if (items.length === 0) return null;
 
@@ -43,51 +65,44 @@ export function NotesCarousel({
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={carouselStyle}
     >
-      {items.map((n) => (
-        <NoteCard key={n.id} note={n} onOpen={onOpen} style={{ width: cardWidth }} />
+      {items.map((s) => (
+        <BookCard key={s.id} subject={s} onOpen={onOpen} style={{ width: cardWidth }} />
       ))}
     </ScrollView>
   );
 }
 
 // ---------------------------------------------------------------------------
-// NoteCard — single note card
+// BookCard — single book card
 // ---------------------------------------------------------------------------
 
-function NoteCard({
-  note,
+function BookCard({
+  subject,
   onOpen,
   style,
 }: {
-  note: Note;
-  onOpen: (n: Note) => void;
+  subject: Subject;
+  onOpen: (s: Subject) => void;
   style?: object;
 }) {
-  const { colors: C } = useColors();
   return (
-    <Card
-      onPress={() => onOpen(note)}
-      accessibilityLabel={`Open note: ${note.title}`}
-      padding={12}
-      style={[cardStatic, style]}
-    >
-      <View style={[pdfBadge, { backgroundColor: C.danger }]}>
-        <Ionicons name="document-text" size={18} color={C.surface} />
-      </View>
-      <Text numberOfLines={2} style={[titleText, { color: C.text }]}>
-        {note.title}
-      </Text>
-      <Text style={[chapterText, { color: C.textSecondary }]}>{note.chapter}</Text>
-      <View style={metaRowStyle}>
-        <Text style={[metaText, { color: C.textSecondary }]}>
-          {note.pages}p · {note.size}
-        </Text>
-        <View style={dlStyle}>
-          <Ionicons name="download-outline" size={13} color={C.primary} />
-          <Text style={[dlTextValue, { color: C.primary }]}>{note.downloads}</Text>
+    <Pressable onPress={() => onOpen(subject)} accessibilityLabel={`Open book: ${subject.name}`}>
+      <LinearGradient
+        colors={subject.color}
+        style={[bookCardStyle, style]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={bookIconWrap}>
+          <Ionicons name={subject.icon} size={22} color="#FFFFFF" />
         </View>
-      </View>
-    </Card>
+        <Text numberOfLines={2} style={bookTitleStyle}>
+          {subject.name}
+        </Text>
+        <Text style={bookBanglaStyle}>{subject.bangla}</Text>
+        <Text style={bookMetaStyle}>{subject.chapterCount} chapters</Text>
+      </LinearGradient>
+    </Pressable>
   );
 }
 
@@ -190,11 +205,10 @@ function QuizRow({
 // Static styles
 // ---------------------------------------------------------------------------
 
-const rowStyle = {
+const gridWrap = {
   flexDirection: 'row' as const,
   flexWrap: 'wrap' as const,
   paddingHorizontal: 16,
-  gap: 12,
 };
 
 const carouselStyle = {
@@ -203,43 +217,44 @@ const carouselStyle = {
   paddingVertical: 2,
 };
 
-const cardStatic = {
-  width: '48%' as const,
-  flexGrow: 1,
+const bookCardStyle = {
+  borderRadius: Radius.lg,
+  padding: 14,
+  minHeight: 152,
+  justifyContent: 'space-between' as const,
+  marginBottom: 12,
+  ...Shadow.card,
 };
 
-const pdfBadge = {
-  width: 36,
-  height: 36,
-  borderRadius: 10,
+const bookIconWrap = {
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  backgroundColor: 'rgba(255,255,255,0.25)',
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
-  marginBottom: 8,
 };
 
-const titleText = {
-  fontSize: 13,
+const bookTitleStyle = {
+  color: '#FFFFFF',
+  fontSize: 14,
   fontWeight: '800' as const,
-  lineHeight: 18,
-};
-
-const chapterText = {
-  fontSize: 11,
-  marginTop: 4,
-};
-
-const metaRowStyle = {
-  flexDirection: 'row' as const,
-  justifyContent: 'space-between' as const,
-  alignItems: 'center' as const,
+  lineHeight: 19,
   marginTop: 10,
 };
 
-const metaText = { fontSize: 11 };
+const bookBanglaStyle = {
+  color: 'rgba(255,255,255,0.9)',
+  fontSize: 11,
+  marginTop: 3,
+};
 
-const dlStyle = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 4 };
-
-const dlTextValue = { fontSize: 11, fontWeight: '700' as const };
+const bookMetaStyle = {
+  color: 'rgba(255,255,255,0.85)',
+  fontSize: 11,
+  fontWeight: '700' as const,
+  marginTop: 8,
+};
 
 const quizListStyle = { paddingHorizontal: 16, gap: 10 };
 

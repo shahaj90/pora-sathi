@@ -69,9 +69,9 @@ const GradeContext = createContext<GradeContextValue | null>(null);
 /**
  * The active class is app-wide state, not per-screen state.
  *
- * Every screen's data is class-scoped (subjects, notes, quizzes, progress all
+ * Every screen's data is class-scoped (subjects, books, quizzes, progress all
  * come from per-class JSON), so the class a learner picks on Home has to be the
- * same class Notes / Quiz / Progress show. Keeping it in a provider is what
+ * same class Books / Quiz / Progress show. Keeping it in a provider is what
  * makes that consistent — previously each tab hard-coded `useState('c10')`, so
  * switching tabs silently reset the class.
  */

@@ -56,7 +56,7 @@ export function SubjectGrid({
               {!compact ? (
                 <>
                   <Text style={metaStyle}>
-                    {s.chapters} chapters · {s.notesCount} PDFs
+                    {s.chapterCount} chapters · {s.booksCount} book
                   </Text>
                   <View style={progressWrap}>
                     <ProgressBar

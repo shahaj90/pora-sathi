@@ -73,7 +73,7 @@ export function HomeHeader({
         <TextInput
           value={query}
           onChangeText={onQueryChange}
-          placeholder="Search notes, quizzes, topics…"
+          placeholder="Search books, quizzes, topics…"
           placeholderTextColor={C.muted}
           style={s.searchInput}
           returnKeyType="search"
@@ -103,8 +103,8 @@ export function HomeHeader({
           <Text style={s.statLabel}>Quizzes done</Text>
         </View>
         <View style={s.statCard}>
-          <Text style={s.statValue}>{stats.notesCount}</Text>
-          <Text style={s.statLabel}>PDF notes</Text>
+          <Text style={s.statValue}>{stats.booksCount}</Text>
+          <Text style={s.statLabel}>Books</Text>
         </View>
       </View>
     </LinearGradient>

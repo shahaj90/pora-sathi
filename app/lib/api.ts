@@ -3,7 +3,6 @@ import type {
   DashboardStats,
   Grade,
   GradeId,
-  Note,
   Quiz,
   SscBanner,
   Subject,
@@ -12,9 +11,6 @@ import dashboardC8 from '../data/dashboard-c8.json';
 import dashboardC9 from '../data/dashboard-c9.json';
 import dashboardC10 from '../data/dashboard-c10.json';
 import gradesJson from '../data/grades.json';
-import notesC8 from '../data/notes-c8.json';
-import notesC9 from '../data/notes-c9.json';
-import notesC10 from '../data/notes-c10.json';
 import quizzesC8 from '../data/quizzes-c8.json';
 import quizzesC9 from '../data/quizzes-c9.json';
 import quizzesC10 from '../data/quizzes-c10.json';
@@ -68,12 +64,6 @@ const SUBJECTS: Record<GradeId, Subject[]> = {
   c10: subjectsC10 as Subject[],
 };
 
-const NOTES: Record<GradeId, Note[]> = {
-  c8: notesC8 as Note[],
-  c9: notesC9 as Note[],
-  c10: notesC10 as Note[],
-};
-
 const QUIZZES: Record<GradeId, Quiz[]> = {
   c8: quizzesC8 as Quiz[],
   c9: quizzesC9 as Quiz[],
@@ -98,11 +88,6 @@ export async function fetchGrades(): Promise<Grade[]> {
 export async function fetchSubjects(gradeId: GradeId): Promise<Subject[]> {
   await delay(MOCK_DELAY_MS);
   return cached(`subjects:${gradeId}`, () => SUBJECTS[gradeId] ?? []);
-}
-
-export async function fetchNotes(gradeId: GradeId): Promise<Note[]> {
-  await delay(MOCK_DELAY_MS);
-  return cached(`notes:${gradeId}`, () => NOTES[gradeId] ?? []);
 }
 
 export async function fetchQuizzes(gradeId: GradeId): Promise<Quiz[]> {
@@ -134,10 +119,13 @@ export function getSubjectsForGrade(gradeId: GradeId): Subject[] {
   return SUBJECTS[gradeId] ?? [];
 }
 
-export function getNotesForGrade(gradeId: GradeId): Note[] {
-  return NOTES[gradeId] ?? [];
-}
-
 export function getQuizzesForGrade(gradeId: GradeId): Quiz[] {
   return QUIZZES[gradeId] ?? [];
+}
+
+export function getSubjectForGrade(
+  gradeId: GradeId,
+  subjectId: Subject['id'],
+): Subject | undefined {
+  return getSubjectsForGrade(gradeId).find((s) => s.id === subjectId);
 }

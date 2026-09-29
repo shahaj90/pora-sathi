@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import type { GradeId, Note, Quiz, Subject } from '../constants/data';
+import type { GradeId, Quiz, Subject } from '../constants/data';
 import {
   fetchDashboardMeta,
   fetchGrades,
-  fetchNotes,
   fetchQuizzes,
   fetchSubjects,
   type DashboardMeta,
@@ -28,13 +27,6 @@ export function useSubjects(gradeId: GradeId) {
   });
 }
 
-export function useNotes(gradeId: GradeId) {
-  return useQuery({
-    queryKey: ['notes', gradeId],
-    queryFn: () => fetchNotes(gradeId),
-  });
-}
-
 export function useQuizzes(gradeId: GradeId) {
   return useQuery({
     queryKey: ['quizzes', gradeId],
@@ -56,7 +48,6 @@ export function useDashboardMeta(gradeId: GradeId) {
 export interface DashboardData {
   grades: Subject[];
   subjects: Subject[];
-  notes: Note[];
   quizzes: Quiz[];
   meta: DashboardMeta;
   isLoading: boolean;
@@ -67,27 +58,19 @@ export interface DashboardData {
 export function useDashboard(gradeId: GradeId) {
   const gradesQ = useGrades();
   const subjectsQ = useSubjects(gradeId);
-  const notesQ = useNotes(gradeId);
   const quizzesQ = useQuizzes(gradeId);
   const metaQ = useDashboardMeta(gradeId);
 
   const isLoading =
-    gradesQ.isLoading ||
-    subjectsQ.isLoading ||
-    notesQ.isLoading ||
-    quizzesQ.isLoading ||
-    metaQ.isLoading;
+    gradesQ.isLoading || subjectsQ.isLoading || quizzesQ.isLoading || metaQ.isLoading;
 
-  const isError =
-    gradesQ.isError || subjectsQ.isError || notesQ.isError || quizzesQ.isError || metaQ.isError;
+  const isError = gradesQ.isError || subjectsQ.isError || quizzesQ.isError || metaQ.isError;
 
-  const error =
-    gradesQ.error ?? subjectsQ.error ?? notesQ.error ?? quizzesQ.error ?? metaQ.error ?? null;
+  const error = gradesQ.error ?? subjectsQ.error ?? quizzesQ.error ?? metaQ.error ?? null;
 
   return {
     grades: gradesQ.data ?? [],
     subjects: subjectsQ.data ?? [],
-    notes: notesQ.data ?? [],
     quizzes: quizzesQ.data ?? [],
     meta: metaQ.data ?? null,
     isLoading,

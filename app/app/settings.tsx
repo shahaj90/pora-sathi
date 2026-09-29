@@ -146,7 +146,7 @@ export default function SettingsScreen() {
                 })}
               </View>
               <Text style={s.browseHint}>
-                Subjects, notes, quizzes and progress all follow this class.
+                Subjects, books, quizzes and progress all follow this class.
               </Text>
             </View>
 

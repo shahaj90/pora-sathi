@@ -54,7 +54,7 @@ export function ProgressSection({
               <ProgressBar value={sbj.progress} color={sbj.color[0]} trackColor={C.border} />
             </View>
             <Text style={s.meta}>
-              {sbj.chapters} chapters · {sbj.notesCount} PDFs · {sbj.quizCount} quizzes
+              {sbj.chapterCount} chapters · {sbj.booksCount} book · {sbj.quizCount} quizzes
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={C.textSecondary} />
