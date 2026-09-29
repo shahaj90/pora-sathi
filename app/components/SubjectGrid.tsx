@@ -22,47 +22,56 @@ export function SubjectGrid({
   const padding = 32; // 16 * 2
   const columns = compact ? 3 : 2;
   const totalGap = gap * (columns - 1);
-  const cardWidth = (width - padding - totalGap) / columns;
+  // Floor the width so floating-point rounding never pushes the last card in
+  // a row onto the next line (was causing 3-column home grids to wrap to 2).
+  const cardWidth = Math.floor((width - padding - totalGap) / columns);
 
   return (
     <View style={gridStyle}>
-      {subjects.map((s) => (
-        <Pressable
-          key={s.id}
-          onPress={() => onOpen(s)}
-          style={({ pressed }) => [cardWrap, { width: cardWidth, opacity: pressed ? 0.92 : 1 }]}
-        >
-          <LinearGradient
-            colors={s.color}
-            style={[cardStyle, compact && cardCompact]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+      {subjects.map((s, i) => {
+        const isLastInRow = (i + 1) % columns === 0;
+        return (
+          <Pressable
+            key={s.id}
+            onPress={() => onOpen(s)}
+            style={({ pressed }) => [
+              cardWrap,
+              { width: cardWidth, marginRight: isLastInRow ? 0 : gap },
+              { opacity: pressed ? 0.92 : 1 },
+            ]}
           >
-            <View style={iconRowStyle}>
-              <View style={[iconBubbleStyle, compact && iconBubbleCompact]}>
-                <Ionicons name={s.icon} size={compact ? 18 : 20} color={C.surface} />
-              </View>
-              {!compact ? <Text style={banglaStyle}>{s.bangla}</Text> : null}
-            </View>
-            <Text style={[nameStyle, compact && nameCompact]}>{s.name}</Text>
-            {!compact ? (
-              <>
-                <Text style={metaStyle}>
-                  {s.chapters} chapters · {s.notesCount} PDFs
-                </Text>
-                <View style={progressWrap}>
-                  <ProgressBar
-                    value={s.progress}
-                    color={C.surface}
-                    trackColor="rgba(255,255,255,0.3)"
-                  />
+            <LinearGradient
+              colors={s.color}
+              style={[cardStyle, compact && cardCompact]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={iconRowStyle}>
+                <View style={[iconBubbleStyle, compact && iconBubbleCompact]}>
+                  <Ionicons name={s.icon} size={compact ? 18 : 20} color={C.surface} />
                 </View>
-                <Text style={progressTextStyle}>{Math.round(s.progress * 100)}% done</Text>
-              </>
-            ) : null}
-          </LinearGradient>
-        </Pressable>
-      ))}
+                {!compact ? <Text style={banglaStyle}>{s.bangla}</Text> : null}
+              </View>
+              <Text style={[nameStyle, compact && nameCompact]}>{s.name}</Text>
+              {!compact ? (
+                <>
+                  <Text style={metaStyle}>
+                    {s.chapters} chapters · {s.notesCount} PDFs
+                  </Text>
+                  <View style={progressWrap}>
+                    <ProgressBar
+                      value={s.progress}
+                      color={C.surface}
+                      trackColor="rgba(255,255,255,0.3)"
+                    />
+                  </View>
+                  <Text style={progressTextStyle}>{Math.round(s.progress * 100)}% done</Text>
+                </>
+              ) : null}
+            </LinearGradient>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -72,10 +81,9 @@ const gridStyle = {
   flexDirection: 'row' as const,
   flexWrap: 'wrap' as const,
   paddingHorizontal: 16,
-  gap: 12,
 };
 
-const cardWrap = { borderRadius: Radius.lg };
+const cardWrap = { borderRadius: Radius.lg, marginBottom: 12 };
 
 const cardStyle = {
   borderRadius: Radius.lg,
