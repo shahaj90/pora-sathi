@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Pdf from 'react-native-pdf';
+import { PdfView } from '../../../components/PdfView';
 import type { GradeId } from '../../../constants/data';
 import { Shadow } from '../../../constants/theme';
 import { useColors } from '../../../context/ColorSchemeContext';
@@ -56,6 +56,19 @@ export default function ReaderScreen() {
     if (chapter) setCurrentPage(chapter.pageStart);
   }, [chapter]);
 
+  const assetId = subject ? PDF_ASSETS[subject.pdfFile] : undefined;
+  const [pdfUri, setPdfUri] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!assetId) {
+      setPdfUri(null);
+      return;
+    }
+    // In dev the asset may not be downloaded yet — fall back to its remote URI.
+    const asset = Asset.fromModule(assetId);
+    setPdfUri(asset.localUri ?? asset.uri);
+  }, [assetId]);
+
   const s = makeStyles(C);
 
   if (!subject || !chapter) {
@@ -71,13 +84,8 @@ export default function ReaderScreen() {
     );
   }
 
-  const assetId = PDF_ASSETS[subject.pdfFile];
-  const pdfSource = assetId
-    ? { uri: Asset.fromModule(assetId).localUri ?? Asset.fromModule(assetId).uri }
-    : undefined;
-
   return (
-    <SafeAreaView style={s.safe} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={s.safe}>
       <View style={s.header}>
         <Pressable onPress={() => router.back()} style={s.back}>
           <Ionicons name="arrow-back" size={20} color={C.text} />
@@ -97,9 +105,9 @@ export default function ReaderScreen() {
         </View>
       </View>
 
-      {pdfSource ? (
-        <Pdf
-          source={pdfSource}
+      {pdfUri && PdfView ? (
+        <PdfView
+          source={{ uri: pdfUri }}
           page={chapter.pageStart}
           onLoadComplete={(numberOfPages) => setTotalPages(numberOfPages)}
           onPageChanged={(page) => setCurrentPage(page)}
@@ -109,9 +117,13 @@ export default function ReaderScreen() {
       ) : (
         <View style={s.placeholder}>
           <Ionicons name="document-text-outline" size={48} color={C.muted} />
-          <Text style={s.placeholderTitle}>PDF not available yet</Text>
+          <Text style={s.placeholderTitle}>
+            {pdfUri ? 'PDF reader unavailable' : 'PDF not available yet'}
+          </Text>
           <Text style={s.placeholderSub}>
-            The {subject.name} book for this class hasn't been added.
+            {pdfUri
+              ? 'Reading PDFs needs a development build with react-native-pdf installed (Expo Go cannot load it).'
+              : `The ${subject.name} book for this class hasn't been added.`}
           </Text>
         </View>
       )}

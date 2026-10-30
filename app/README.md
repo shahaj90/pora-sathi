@@ -38,4 +38,9 @@ npx expo start
 # press `w` for web, `a`/`i` for device
 ```
 
+- **Web** needs `react-dom` + `react-native-web` + `@expo/metro-runtime` (already in `package.json`), or `npm run web`.
+- **PDF reader** uses `react-native-pdf` (native-only). In Expo Go the reader shows an
+  explanatory placeholder; use a development build to read PDFs:
+  `npx expo prebuild && npx expo run:android`.
+
 Responsive: `useWindowDimensions` grid, scrollable grade tabs, `%`-width cards, safe-area + bottom-nav padding.

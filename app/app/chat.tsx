@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Gradients, Radius } from '../constants/theme';
 import { useColors } from '../context/ColorSchemeContext';
+import { useGrade } from '../context/GradeContext';
 
 interface Msg {
   id: string;
@@ -31,6 +32,7 @@ const SUGGESTIONS = [
 
 export default function ChatScreen() {
   const { colors: C } = useColors();
+  const { gradeLabel } = useGrade();
   const router = useRouter();
   const [msgs, setMsgs] = useState<Msg[]>([
     {
@@ -68,7 +70,7 @@ export default function ChatScreen() {
           </View>
           <View style={s.flex}>
             <Text style={s.title}>Pora Sathi AI</Text>
-            <Text style={s.online}>● Online · Class 10 tutor</Text>
+            <Text style={s.online}>● Online · {gradeLabel} tutor</Text>
           </View>
           <Ionicons name="ellipsis-vertical" size={18} color={C.surface} />
         </LinearGradient>
